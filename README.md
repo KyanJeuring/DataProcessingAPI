@@ -47,7 +47,7 @@ Changes in `backend/src` automatically restart the Spring Boot app.
 ## 🧠 What's inside the containers?
 
 ### Frontend:
-- Node 20 (inside container)
+- Vue.js
 - Vite dev server
 - HMR enabled
 - Your code is bind‑mounted from your machine
