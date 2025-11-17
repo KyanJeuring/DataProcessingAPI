@@ -104,3 +104,21 @@ fetch(import.meta.env.VITE_BACKEND_URL + "/api/hello")
 ```
 
 ---
+
+## Postgres & pgAdmin (added)
+
+This compose setup now includes a Postgres service and pgAdmin for database administration.
+
+- Postgres service:
+	- Container name: `db`
+	- Database: `datadb`
+	- User: `postgres` / password: `postgres`
+	- Exposed host port: `5432` — use this if you want to connect from your host tools.
+
+- pgAdmin:
+	- UI: `http://localhost:8081`
+	- When adding a server inside pgAdmin, use host `db` and port `5432` (pgAdmin runs inside the same Compose network and talks to the container directly).
+
+Example: connect from host using psql or a GUI to `localhost:5433` with user `postgres` and password `postgres`.
+
+---
