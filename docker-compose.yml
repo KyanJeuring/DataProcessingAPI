@@ -36,7 +36,7 @@ services:
       - "5432:5432"
 
   pgadmin:
-    image: dpage/pgadmin4:7
+    image: dpage/pgadmin4:9.10
     restart: unless-stopped
     # Load PGAdmin credentials from project .env file (see .env.example)
     env_file:
