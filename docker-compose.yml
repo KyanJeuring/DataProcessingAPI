@@ -4,11 +4,12 @@ services:
       context: ./backend
       dockerfile: Dockerfile.dev
     ports:
-      - "8080:8080"
+      - "8081:8081"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/datadb
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SERVER_PORT=8081
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/dataprocessingapi_db
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
 
   frontend:
     build:
@@ -23,31 +24,41 @@ services:
     environment:
       - VITE_BACKEND_URL=/api
 
-  db:
-    image: postgres:15-alpine
-    restart: unless-stopped
+  postgres:
+    image: postgres:latest
+    container_name: dataprocessingapi_db
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=datadb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: dataprocessingapi_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d dataprocessingapi_db || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     ports:
       - "5432:5432"
+    restart: unless-stopped
 
   pgadmin:
-    image: dpage/pgadmin4:9.10
-    restart: unless-stopped
-    # Load PGAdmin credentials from project .env file (see .env.example)
-    env_file:
-      - .env
+    image: dpage/pgadmin4:latest
+    container_name: dataprocessingapi_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
-      - "8081:80"
+      - "8080:80"
+    volumes:
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+      - pgadmin:/var/lib/pgadmin
+    restart: unless-stopped
     depends_on:
-      - db
+      postgres:
+        condition: service_healthy
 
 volumes:
   frontend_node_modules:
-
-  postgres_data:
-
+  postgres:
+  pgadmin:

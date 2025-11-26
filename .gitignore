@@ -8,3 +8,4 @@ backend/target/
 *.iml
 .DS_Store
 Thumbs.db
+servers.json

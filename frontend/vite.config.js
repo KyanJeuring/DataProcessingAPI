@@ -16,7 +16,7 @@ export default defineConfig({
     proxy: {
       // Proxy API requests to the backend service inside the compose network
       '/api': {
-        target: 'http://backend:8080',
+        target: 'http://backend:8081',
         changeOrigin: true,
         secure: false,
       },
