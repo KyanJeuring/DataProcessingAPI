@@ -6,6 +6,7 @@ backend/target/
 .vscode/
 .idea/
 build/
+out/
 *.iml
 .DS_Store
 Thumbs.db
