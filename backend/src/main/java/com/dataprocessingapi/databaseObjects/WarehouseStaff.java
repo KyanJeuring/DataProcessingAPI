@@ -6,14 +6,13 @@ public class WarehouseStaff {
     private ArrayList<WarehouseStock> warehouseStocks;
 
     public WarehouseStaff() {
-
     }
 
     public ArrayList<WarehouseStock> getWarehouseStocks() {
         return this.warehouseStocks;
     }
 
-    public void setWarehouseStocks(ArrayList<WarehouseStock> warehouseStocks) {
-        this.warehouseStocks = warehouseStocks;
+    public void addWarehouseStock(WarehouseStock warehouseStock) {
+        this.warehouseStocks.add(warehouseStock);
     }
 }

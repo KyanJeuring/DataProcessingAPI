@@ -4,21 +4,25 @@ import java.time.LocalDate;
 import java.util.HashSet;
 
 public class Vehicle  {
+    private static final double MAXIMUM_LOAD_CAPACITY = 40000.0;
+
     private VehicleType vehicleType;
     private LoadType loadType;
     private double loadCapacity;
     private LocalDate manufactureYear;
-    private double sensorData;
+    private String sensorData;
     private HashSet<LoadType> supportedLoadTypes;
     private HashSet<String> supportedRouteTypes;
 
     public Vehicle(LoadType loadType, VehicleType vehicleType, double loadCapacity,
-                   LocalDate manufactureYear, double sensorData) {
-        this.loadType = loadType;
-        this.vehicleType = vehicleType;
-        this.loadCapacity = loadCapacity;
-        this.manufactureYear = manufactureYear;
-        this.sensorData = sensorData;
+                   LocalDate manufactureYear, String sensorData) {
+        this.setLoadType(loadType);
+        this.setVehicleType(vehicleType);
+        this.setLoadCapacity(loadCapacity);
+        this.setManufactureYear(manufactureYear);
+        this.setSensorData(sensorData);
+        this.supportedLoadTypes = new HashSet<>();
+        this.supportedRouteTypes = new HashSet<>();
     }
 
     public VehicleType getVehicleType() {
@@ -26,6 +30,10 @@ public class Vehicle  {
     }
 
     public void setVehicleType(VehicleType vehicleType) {
+        if (vehicleType == null) {
+            throw new IllegalArgumentException("Please provide a valid vehicle type.");
+        }
+
         this.vehicleType = vehicleType;
     }
 
@@ -34,6 +42,10 @@ public class Vehicle  {
     }
 
     public void setLoadType(LoadType loadType) {
+        if (loadType == null) {
+            throw new IllegalArgumentException("Please provide a valid load type.");
+        }
+
         this.loadType = loadType;
     }
 
@@ -42,22 +54,43 @@ public class Vehicle  {
     }
 
     public void setLoadCapacity(double loadCapacity) {
+        if (loadCapacity < 0) {
+            throw new IllegalArgumentException("The load capacity cannot be a positive value.");
+        }
+
+        if (loadCapacity > MAXIMUM_LOAD_CAPACITY) {
+            throw new IllegalArgumentException("This value is above the weight limit of " +
+                                                MAXIMUM_LOAD_CAPACITY + ".");
+        }
+
         this.loadCapacity = loadCapacity;
     }
 
-    public LocalDate getManufactureYear() {
-        return this.manufactureYear;
+    public int getManufactureYear() {
+        return this.manufactureYear.getYear();
     }
 
     public void setManufactureYear(LocalDate manufactureYear) {
+        if (this.manufactureYear == null) {
+            throw new IllegalArgumentException("Please provide an valid date.");
+        }
+
+        if (this.manufactureYear.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("The year of manufacture cannot be in the future.");
+        }
+
         this.manufactureYear = manufactureYear;
     }
 
-    public double getSensorData() {
+    public String getSensorData() {
         return this.sensorData;
     }
 
-    public void setSensorData(double sensorData) {
+    public void setSensorData(String sensorData) {
+        if (sensorData == null) {
+            throw new IllegalArgumentException("Please provide a String.");
+        }
+
         this.sensorData = sensorData;
     }
 
@@ -65,15 +98,15 @@ public class Vehicle  {
         return this.supportedLoadTypes;
     }
 
-    public void setSupportedLoadTypes(HashSet<LoadType> supportedLoadTypes) {
-        this.supportedLoadTypes = supportedLoadTypes;
+    public void addSupportedLoadType(LoadType loadType) {
+        this.supportedLoadTypes.add(loadType);
     }
 
     public HashSet<String> getSupportedRouteTypes() {
         return this.supportedRouteTypes;
     }
 
-    public void setSupportedRouteTypes(HashSet<String> supportedRouteTypes) {
-        this.supportedRouteTypes = supportedRouteTypes;
+    public void addSupportedRouteType(String string) {
+        this.supportedRouteTypes.add(string);
     }
 }
