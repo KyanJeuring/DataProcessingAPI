@@ -2,7 +2,7 @@
 
 DO $$
 BEGIN
-    CREATE TYPE user_role AS ENUM ('admin', 'manager', 'driver', 'viewer');
+    CREATE TYPE user_role AS ENUM ('ADMIN', 'MANAGER', 'DRIVER', 'VIEWER');
     EXCEPTION WHEN duplicate_object THEN null;
 END
 $$;
@@ -10,7 +10,7 @@ $$;
 
 DO $$
 BEGIN
-    CREATE TYPE invite_status AS ENUM ('pending', 'accepted', 'expired');
+    CREATE TYPE invite_status AS ENUM ('PENDING', 'ACCEPTED', 'EXPIRED');
     EXCEPTION WHEN duplicate_object THEN null;
 END
 $$;
@@ -18,7 +18,7 @@ $$;
 
 DO $$
 BEGIN
-    CREATE TYPE referral_status AS ENUM ('pending', 'accepted', 'expired');
+    CREATE TYPE referral_status AS ENUM ('PENDING', 'ACCEPTED', 'EXPIRED');
     EXCEPTION WHEN duplicate_object THEN null;
 END
 $$;
@@ -26,7 +26,7 @@ $$;
 
 DO $$
 BEGIN
-    CREATE TYPE license_name AS ENUM ('Basic', 'Professional', 'Enterprise');
+    CREATE TYPE license_name AS ENUM ('BASIC', 'PROFESSIONAL', 'ENTERPRISE');
     EXCEPTION WHEN duplicate_object THEN null;
 END
 $$;
@@ -34,7 +34,7 @@ $$;
 
 DO $$
 BEGIN
-    CREATE TYPE maintenance_status AS ENUM ('scheduled', 'in_progress', 'completed', 'cancelled');
+    CREATE TYPE maintenance_status AS ENUM ('SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED');
     EXCEPTION WHEN duplicate_object THEN null;
 END
 $$;
@@ -42,7 +42,7 @@ $$;
 
 DO $$
 BEGIN
-    CREATE TYPE vehicle_type AS ENUM ('lorry', 'van', 'refrigerated_truck');
+    CREATE TYPE vehicle_type AS ENUM ('LORRY', 'VAN', 'REFRIGERATED_TRUCK');
     EXCEPTION WHEN duplicate_object THEN null;
 END
 $$;
@@ -50,7 +50,7 @@ $$;
 
 DO $$
 BEGIN
-    CREATE TYPE load_type AS ENUM ('normal', 'refrigerated', 'hazardous');
+    CREATE TYPE load_type AS ENUM ('NORMAL', 'REFRIGERATED', 'HAZARDOUS');
     EXCEPTION WHEN duplicate_object THEN null;
 END
 $$;
@@ -59,19 +59,19 @@ $$;
 DO $$
 BEGIN
     CREATE TYPE progress_type AS ENUM (
-        'loading',
-        'departure',
-        'stopover',
-        'break',
-        'fuel',
-        'stop',
-        'inspection',
-        'deviation',
-        'breakdown',
-        'interruption',
-        'unloading',
-        'arrival',
-        'completion'
+        'LOADING',
+        'DEPARTURE',
+        'STOPOVER',
+        'BREAK',
+        'FUEL',
+        'STOP',
+        'INSPECTION',
+        'DEVIATION',
+        'BREAKDOWN',
+        'INTERRUPTION',
+        'UNLOADING',
+        'ARRIVAL',
+        'COMPLETION'
     );
     EXCEPTION WHEN duplicate_object THEN null;
 END
@@ -80,11 +80,11 @@ $$;
 
 -- COMPANIES (parent table for many)
 
-CREATE TABLE IF NOT EXISTS companies (
+CREATE TABLE IF NOT EXISTS company (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR NOT NULL,
     license BIGINT,
-    discountRecieved BOOLEAN DEFAULT FALSE
+    discount_received BOOLEAN DEFAULT FALSE
 );
 
 -- COMPANY_ACCOUNT + AUTH TABLES
@@ -94,36 +94,36 @@ CREATE TABLE IF NOT EXISTS company_account (
     company_id BIGINT REFERENCES companies(id),
     username VARCHAR NOT NULL UNIQUE,
     email VARCHAR NOT NULL UNIQUE,
-    passwordHash VARCHAR NOT NULL,
-    firstName VARCHAR,
-    lastName VARCHAR,
-    isActive BOOLEAN DEFAULT TRUE,
-    dateCreated TIMESTAMP DEFAULT NOW(),
+    password_hash VARCHAR NOT NULL,
+    first_name VARCHAR,
+    last_name VARCHAR,
+    is_active BOOLEAN DEFAULT TRUE,
+    date_created TIMESTAMP DEFAULT NOW(),
     roles user_role[] NOT NULL DEFAULT ARRAY[]::user_role[],
     preferences JSONB
 );
 
 CREATE TABLE IF NOT EXISTS logins (
     id BIGSERIAL PRIMARY KEY,
-    userId BIGINT NOT NULL REFERENCES company_account(id),
+    user_id BIGINT NOT NULL REFERENCES company_account(id),
     time TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS password_recovery (
     id BIGSERIAL PRIMARY KEY,
-    userId BIGINT NOT NULL REFERENCES company_account(id),
-    recoveryToken UUID NOT NULL,
-    expiryTime TIMESTAMP NOT NULL,
-    isActive BOOLEAN DEFAULT TRUE
+    user_id BIGINT NOT NULL REFERENCES company_account(id),
+    recovery_token UUID NOT NULL,
+    expiry_time TIMESTAMP NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE IF NOT EXISTS user_invites (
     id BIGSERIAL PRIMARY KEY,
     inviter_id BIGINT REFERENCES company_account(id),
-    inviteeEmail VARCHAR NOT NULL,
-    inviteToke VARCHAR NOT NULL,
+    invitee_email VARCHAR NOT NULL,
+    invite_token VARCHAR NOT NULL,
     status invite_status NOT NULL DEFAULT 'pending',
-    dateSent TIMESTAMP DEFAULT NOW()
+    date_sent TIMESTAMP DEFAULT NOW()
 );
 
 -- LICENSE LEVELS + SUBSCRIPTIONS + REFERRALS
@@ -131,45 +131,45 @@ CREATE TABLE IF NOT EXISTS user_invites (
 CREATE TABLE IF NOT EXISTS license_levels (
     id SERIAL PRIMARY KEY,
     name license_name NOT NULL,
-    MAX_VEHICLES BIGINT,
-    MAX_DRIVERS BIGINT,
-    MAX_ASSIGNMENTS BIGINT,
-    monthlyFee DOUBLE PRECISION
+    max_vehicles BIGINT,
+    max_drivers BIGINT,
+    max_assignments BIGINT,
+    monthly_fee DOUBLE PRECISION
 );
 
 CREATE TABLE IF NOT EXISTS subscriptions (
     id BIGSERIAL PRIMARY KEY,
-    companyId BIGINT NOT NULL REFERENCES companies(id),
-    licenseId BIGINT NOT NULL REFERENCES license_levels(id),
-    startDate DATE NOT NULL,
-    endDate DATE,
-    isTrial BOOLEAN DEFAULT FALSE,
-    discountRate BIGINT DEFAULT 0
+    company_id BIGINT NOT NULL REFERENCES company(id),
+    license_id BIGINT NOT NULL REFERENCES license_levels(id),
+    start_date DATE NOT NULL,
+    end_date DATE,
+    is_trial BOOLEAN DEFAULT FALSE,
+    discount_rate BIGINT DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS referral_links (
     id BIGSERIAL PRIMARY KEY,
-    inviterCompanyId BIGINT REFERENCES companies(id),
-    invitedCompanyId BIGINT REFERENCES companies(id),
-    invitationCode VARCHAR NOT NULL,
-    dateSent TIMESTAMP DEFAULT NOW(),
-    dateAccepted TIMESTAMP,
-    discountStatus referral_status DEFAULT 'pending',
-    validityPeriodDays BIGINT,
-    discountActivatedOn DATE
+    inviter_company_id BIGINT REFERENCES company(id),
+    invited_company_id BIGINT REFERENCES company(id),
+    invitation_code VARCHAR NOT NULL,
+    date_sent TIMESTAMP DEFAULT NOW(),
+    date_accepted TIMESTAMP,
+    discount_status referral_status DEFAULT 'pending',
+    validity_period_days BIGINT,
+    discount_activated_on DATE
 );
 
 -- VEHICLES + MAINTENANCE
 
 CREATE TABLE IF NOT EXISTS vehicles (
     id SERIAL PRIMARY KEY,
-    loadCapacity BIGINT,
+    load_capacity BIGINT,
     type vehicle_type NOT NULL,
-    yearOfManufacture DATE,
-    loadType load_type[] NOT NULL DEFAULT ARRAY[]::load_type[],
-    maintenanceId BIGINT,
-    lastOdometer BIGINT,
-    sensorData JSONB
+    year_of_manufacture DATE,
+    load_type load_type[] NOT NULL DEFAULT ARRAY[]::load_type[],
+    maintenance_id BIGINT,
+    last_odometer BIGINT,
+    sensor_data JSONB
 );
 
 CREATE TABLE IF NOT EXISTS maintenance_records (
@@ -177,52 +177,52 @@ CREATE TABLE IF NOT EXISTS maintenance_records (
     vehicle_id BIGINT NOT NULL REFERENCES vehicles(id),
     date DATE,
     odometer BIGINT,
-    maintenanceType VARCHAR(255),
+    maintenance_type VARCHAR(255),
     description TEXT,
     cost DECIMAL(10,2),
     status maintenance_status DEFAULT 'scheduled',
-    dateCreated TIMESTAMP DEFAULT NOW(),
-    dateModified TIMESTAMP,
-    modifiedBy BIGINT REFERENCES company_account(id)
+    date_created TIMESTAMP DEFAULT NOW(),
+    date_modified TIMESTAMP,
+    modified_by BIGINT REFERENCES company_account(id)
 );
 
 CREATE TABLE IF NOT EXISTS vehicles_maintenance (
-    maintenanceId BIGINT REFERENCES maintenance_records(id),
-    vehicleId BIGINT REFERENCES vehicles(id),
-    PRIMARY KEY (maintenanceId, vehicleId)
+    maintenance_id BIGINT REFERENCES maintenance_records(id),
+    vehicle_id BIGINT REFERENCES vehicles(id),
+    PRIMARY KEY (maintenance_id, vehicle_id)
 );
 
 CREATE TABLE IF NOT EXISTS company_vehicles (
-    companyId BIGINT REFERENCES companies(id),
-    vehicleId BIGINT REFERENCES vehicles(id),
-    PRIMARY KEY (companyId, vehicleId)
+    company_id BIGINT REFERENCES company(id),
+    vehicle_id BIGINT REFERENCES vehicles(id),
+    PRIMARY KEY (company_id, vehicle_id)
 );
 
 -- ORDERS + PROGRESS
 
 CREATE TABLE IF NOT EXISTS orders (
     id BIGSERIAL PRIMARY KEY,
-    "pick-up" POINT,
+    pick_up POINT,
     delivery POINT,
-    loadType load_type NOT NULL,
-    departureTime TIMESTAMP,
-    arrivalTime TIMESTAMP,
+    load_type load_type NOT NULL,
+    departure_time TIMESTAMP,
+    arrival_time TIMESTAMP,
     status VARCHAR,
-    vehicleId BIGINT REFERENCES vehicles(id),
-    driverId BIGINT REFERENCES company_account(id)
+    vehicle_id BIGINT REFERENCES vehicles(id),
+    driver_id BIGINT REFERENCES company_account(id)
 );
 
 CREATE TABLE IF NOT EXISTS progress (
     id BIGSERIAL PRIMARY KEY,
-    orderId BIGINT REFERENCES orders(id),
-    currentPos POINT,
+    order_id BIGINT REFERENCES orders(id),
+    current_pos POINT,
     time TIMESTAMP DEFAULT NOW(),
     type progress_type NOT NULL,
     description JSONB
 );
 
 CREATE TABLE IF NOT EXISTS order_progress (
-    orderId BIGINT REFERENCES orders(id),
-    progressId BIGINT REFERENCES progress(id),
-    PRIMARY KEY (orderId, progressId)
+    order_id BIGINT REFERENCES orders(id),
+    progress_id BIGINT REFERENCES progress(id),
+    PRIMARY KEY (order_id, progress_id)
 );
