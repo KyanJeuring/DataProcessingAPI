@@ -24,11 +24,11 @@ public class CompaniesController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "name is required");
         }
         Long id = jdbc.queryForObject(
-                "INSERT INTO companies (name, license, discountRecieved) VALUES (?, ?, ?) RETURNING id",
-                Long.class,
-                req.name.trim(),
-                req.license,
-                req.discountReceived != null ? req.discountReceived : Boolean.FALSE
+            "INSERT INTO company (name, license, discount_received) VALUES (?, ?, ?) RETURNING id",
+            Long.class,
+            req.name.trim(),
+            req.license,
+            req.discountReceived != null ? req.discountReceived : Boolean.FALSE
         );
         return new Company(id,
                 req.name.trim(),
@@ -42,9 +42,9 @@ public class CompaniesController {
                 rs.getLong("id"),
                 rs.getString("name"),
                 (Long) rs.getObject("license"),
-                rs.getBoolean("discountRecieved")
+                rs.getBoolean("discount_received")
         );
-        return jdbc.query("SELECT id, name, license, discountRecieved FROM companies ORDER BY id DESC", mapper);
+        return jdbc.query("SELECT id, name, license, discount_received FROM company ORDER BY id DESC", mapper);
     }
 
     public static class CreateCompany {
