@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS company (
 
 CREATE TABLE IF NOT EXISTS company_account (
     id BIGSERIAL PRIMARY KEY,
-    company_id BIGINT REFERENCES companies(id),
+    company_id BIGINT REFERENCES company(id),
     username VARCHAR NOT NULL UNIQUE,
     email VARCHAR NOT NULL UNIQUE,
     password_hash VARCHAR NOT NULL,
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS user_invites (
     inviter_id BIGINT REFERENCES company_account(id),
     invitee_email VARCHAR NOT NULL,
     invite_token VARCHAR NOT NULL,
-    status invite_status NOT NULL DEFAULT 'pending',
+    status invite_status NOT NULL DEFAULT 'PENDING',
     date_sent TIMESTAMP DEFAULT NOW()
 );
 
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS referral_links (
     invitation_code VARCHAR NOT NULL,
     date_sent TIMESTAMP DEFAULT NOW(),
     date_accepted TIMESTAMP,
-    discount_status referral_status DEFAULT 'pending',
+    discount_status referral_status DEFAULT 'PENDING',
     validity_period_days BIGINT,
     discount_activated_on DATE
 );
@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS maintenance_records (
     maintenance_type VARCHAR(255),
     description TEXT,
     cost DECIMAL(10,2),
-    status maintenance_status DEFAULT 'scheduled',
+    status maintenance_status DEFAULT 'SCHEDULED',
     date_created TIMESTAMP DEFAULT NOW(),
     date_modified TIMESTAMP,
     modified_by BIGINT REFERENCES company_account(id)
