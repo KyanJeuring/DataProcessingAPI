@@ -34,7 +34,15 @@ $$;
 
 DO $$
 BEGIN
-    CREATE TYPE maintenance_status AS ENUM ('SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED');
+    CREATE TYPE order_status AS ENUM ('PENDING', 'IN_TRANSIT', 'DELIVERED', 'CANCELED');
+    EXCEPTION WHEN duplicate_object THEN null;
+END
+$$;
+
+
+DO $$
+BEGIN
+    CREATE TYPE maintenance_status AS ENUM ('SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELED');
     EXCEPTION WHEN duplicate_object THEN null;
 END
 $$;
@@ -207,7 +215,7 @@ CREATE TABLE IF NOT EXISTS orders (
     load_type load_type NOT NULL,
     departure_time TIMESTAMP,
     arrival_time TIMESTAMP,
-    status VARCHAR,
+    status order_status NOT NULL DEFAULT 'PENDING',
     vehicle_id BIGINT REFERENCES vehicles(id),
     driver_id BIGINT REFERENCES company_account(id)
 );
