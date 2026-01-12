@@ -6,9 +6,10 @@ import com.fleetmaster.dtos.VerifyCodeDto;
 import com.fleetmaster.entities.User;
 import com.fleetmaster.repositories.UserRepository;
 import com.fleetmaster.security.JwtUtil;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.security.SecureRandom;
 import java.util.Random;
 
 @Service
@@ -17,11 +18,20 @@ public class AuthService {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository repo, EmailService emailService, JwtUtil jwtUtil) {
+    private final Random random = new SecureRandom();
+
+    public AuthService(
+            UserRepository repo,
+            EmailService emailService,
+            JwtUtil jwtUtil,
+            PasswordEncoder passwordEncoder
+    ) {
         this.userRepository = repo;
         this.emailService = emailService;
         this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void register(RegisterDto dto) {
@@ -30,11 +40,12 @@ public class AuthService {
         }
 
         User user = new User();
-        user.setName(dto.getName());
+        user.setName(dto.getName()); 
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setStatus("ACTIVE");
         user.setVerified(false);
+
         user.setLoginAttempts(0);
         user.setVerifyAttempts(0);
 
@@ -55,7 +66,9 @@ public class AuthService {
 
         String code = generateVerificationCode();
         user.setVerificationCode(code);
+
         user.setVerifyAttempts(0);
+
         userRepository.save(user);
         emailService.sendVerificationCode(email, code);
     }
@@ -67,11 +80,12 @@ public class AuthService {
         if ("BLOCKED".equals(user.getStatus())) {
             throw new RuntimeException("User is blocked");
         }
-
-        if (user.getVerificationCode().equals(dto.getCode())) {
+        
+        String savedCode = user.getVerificationCode();
+        if (savedCode != null && savedCode.equals(dto.getCode())) {
             user.setVerified(true);
             user.setVerifyAttempts(0);
-            user.setVerificationCode(null); // clear the code
+            user.setVerificationCode(null); 
         } else {
             user.setVerifyAttempts(user.getVerifyAttempts() + 1);
             if (user.getVerifyAttempts() >= 3) {
@@ -80,14 +94,6 @@ public class AuthService {
         }
 
         userRepository.save(user);
-    }
-
-    private String generateVerificationCode() {
-        return String.format("%04d", new Random().nextInt(10000));
-    }
-
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
     }
 
     public String login(LoginDto dto) {
@@ -102,7 +108,7 @@ public class AuthService {
             throw new RuntimeException("Account blocked");
         }
 
-        if (!user.getPassword().equals(dto.getPassword())) {
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             user.setLoginAttempts(user.getLoginAttempts() + 1);
             if (user.getLoginAttempts() >= 3) {
                 user.setStatus("BLOCKED");
@@ -115,5 +121,13 @@ public class AuthService {
         userRepository.save(user);
 
         return jwtUtil.generateToken(user.getEmail());
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    private String generateVerificationCode() {
+        return String.format("%04d", random.nextInt(10000));
     }
 }

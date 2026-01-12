@@ -3,18 +3,18 @@ package com.fleetmaster.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "company_account")
 public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "username", nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "passwordhash", nullable = false)
     private String password;
 
     @Column(nullable = false)
@@ -26,7 +26,7 @@ public class User {
     @Column(name = "verify_attempts", nullable = false)
     private int verifyAttempts = 0;
 
-    @Column(nullable = false)
+    @Column(name = "isactive")
     private String status = "ACTIVE"; // ACTIVE or BLOCKED
 
     @Column(name = "verification_code", length = 4)

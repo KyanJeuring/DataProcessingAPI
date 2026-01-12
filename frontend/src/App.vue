@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { RouterLink, RouterView } from "vue-router";
 
 const message = ref("");
 const name = ref("");
@@ -53,4 +54,12 @@ async function submit(e) {
       <div>{{ message }}</div>
     </div>
   </section>
+  
+  <nav>
+    <RouterLink to="/signup">Signup</RouterLink>
+    |
+    <RouterLink to="/login">Login</RouterLink>
+  </nav>
+
+  <RouterView />
 </template>

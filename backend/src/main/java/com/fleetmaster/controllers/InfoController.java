@@ -23,7 +23,7 @@ public class InfoController {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).body("Unauthorized");
         }
-
+               
         User user = (User) authentication.getPrincipal();
         if (!user.isVerified()) {
             return ResponseEntity.status(403).body("User not verified");

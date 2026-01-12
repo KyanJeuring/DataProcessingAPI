@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS user_invites (
     id BIGSERIAL PRIMARY KEY,
     inviter_id BIGINT REFERENCES company_account(id),
     inviteeEmail VARCHAR NOT NULL,
-    inviteToke VARCHAR NOT NULL,
+    inviteToken VARCHAR NOT NULL,
     status invite_status NOT NULL DEFAULT 'pending',
     dateSent TIMESTAMP DEFAULT NOW()
 );
