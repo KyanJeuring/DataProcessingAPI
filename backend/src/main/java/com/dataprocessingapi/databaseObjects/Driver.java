@@ -15,23 +15,35 @@ public class Driver {
         return this.vehicles;
     }
 
-    public void setVehicles(HashSet<Vehicle> vehicles) {
-        this.vehicles = vehicles;
+    public void addVehicle(Vehicle vehicle) {
+        if (vehicle == null) {
+            throw new IllegalArgumentException("Please provide a vehicle object.");
+        }
+
+        this.vehicles.add(vehicle);
     }
 
     public HashSet<TransportOrder> getCurrentOrders() {
         return this.currentOrders;
     }
 
-    public void setCurrentOrders(HashSet<TransportOrder> currentOrders) {
-        this.currentOrders = currentOrders;
+    public void addCurrentOrder(TransportOrder currentOrder) {
+        if (currentOrder == null) {
+            throw new IllegalArgumentException("Please provide a transport order object.");
+        }
+
+        this.currentOrders.add(currentOrder);
     }
 
     public HashSet<TransportOrder> getFutureOrders() {
         return this.futureOrders;
     }
 
-    public void setFutureOrders(HashSet<TransportOrder> futureOrders) {
-        this.futureOrders = futureOrders;
+    public void addFutureOrder(TransportOrder futureOrder) {
+        if (futureOrder == null) {
+            throw new IllegalArgumentException("Please provide a transport order object.");
+        }
+
+        this.futureOrders.add(futureOrder);
     }
 }
