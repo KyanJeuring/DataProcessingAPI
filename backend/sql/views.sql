@@ -32,7 +32,7 @@ JOIN company_vehicles cv ON o.vehicle_id = cv.vehicle_id
 LEFT JOIN progress p ON o.id = p.order_id
 -- We filter out completed ones
 WHERE o.status != 'DELIVERED' AND o.status != 'CANCELED'
-ORDER BY o.id, p.time DESC;
+ORDER BY o.id, p.time DESC NULLS LAST;
 
 -- View: vw_fleet_status for overview of vehicles and their maintenance status per company
 CREATE OR REPLACE VIEW vw_fleet_status AS
