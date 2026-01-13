@@ -36,6 +36,9 @@ public class User {
     @Column(name = "locked_until")
     private LocalDateTime lockedUntil;
 
+    @Column(name = "company_id")
+    private Long companyId;
+
     // Getters / setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -57,4 +60,6 @@ public class User {
     public void setVerificationCode(String verificationCode) { this.verificationCode = verificationCode; }
     public LocalDateTime getLockedUntil() { return lockedUntil; }
     public void setLockedUntil(LocalDateTime lockedUntil) { this.lockedUntil = lockedUntil; }
+    public Long getCompanyId() { return companyId; }
+    public void setCompanyId(Long companyId) { this.companyId = companyId; }
 }

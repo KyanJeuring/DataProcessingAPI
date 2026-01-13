@@ -23,7 +23,10 @@ async function login() {
     if (!res.ok) throw new Error("Login failed");
 
     const data = await res.json();
-    if (data.token) localStorage.setItem("token", data.token);
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      window.location.href = "/dashboard";
+    }
   } catch (e) {
     error.value = e.message;
   }

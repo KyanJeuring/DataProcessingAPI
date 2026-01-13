@@ -6,6 +6,9 @@ import com.fleetmaster.dtos.VerifyCodeDto;
 import com.fleetmaster.entities.User;
 import com.fleetmaster.repositories.UserRepository;
 import com.fleetmaster.security.JwtUtil;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,9 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private final Random random = new SecureRandom();
 
     public AuthService(
@@ -35,9 +41,30 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public void register(RegisterDto dto) {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
+        }
+
+        Long companyId = null;
+        if (dto.getCompanyName() != null && !dto.getCompanyName().isBlank()) {
+            // Call stored procedure to create company and get ID
+            // Function returns table(company_id, subscription_id, ...)
+            // We select just the company_id
+            try {
+                Object result = entityManager.createNativeQuery(
+                        "SELECT company_id FROM sp_register_company(:name, 'BASIC', true)")
+                        .setParameter("name", dto.getCompanyName())
+                        .getSingleResult();
+                
+                if (result instanceof Number) {
+                    companyId = ((Number) result).longValue();
+                }
+            } catch (Exception e) {
+                // If company exists or other error
+                throw new RuntimeException("Error creating company: " + e.getMessage());
+            }
         }
 
         User user = new User();
@@ -46,6 +73,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setStatus("ACTIVE");
         user.setVerified(false);
+        user.setCompanyId(companyId);
 
         user.setLoginAttempts(0);
         user.setVerifyAttempts(0);

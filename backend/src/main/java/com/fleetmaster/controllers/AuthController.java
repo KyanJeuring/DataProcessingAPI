@@ -39,4 +39,9 @@ public class AuthController {
         authService.checkVerifyCode(dto);
         return ResponseEntity.ok("Verification checked.");
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(org.springframework.security.core.Authentication authentication) {
+        return ResponseEntity.ok(authentication.getPrincipal());
+    }
 }
