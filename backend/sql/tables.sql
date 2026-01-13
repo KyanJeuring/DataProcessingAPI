@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS logins (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES company_account(id),
     time TIMESTAMP NOT NULL DEFAULT NOW(),
-    is_successful BOOLEAN NOT NULL
+    is_successful BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS password_recovery (
