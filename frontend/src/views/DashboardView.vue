@@ -45,8 +45,8 @@ const progressUpdate = ref({
   statusMessage: ""
 });
 
-// Current user ID (needed for driverId in order creation usually, assuming self-dispatch)
-const currentUserId = ref(null);
+// Current company account ID (needed for driverId in order creation usually, assuming self-dispatch)
+const currentCompanyAccountId = ref(null);
 
 onMounted(async () => {
   if (!token) {
@@ -63,12 +63,12 @@ async function fetchMe() {
       headers: { "Authorization": `Bearer ${token}` }
     });
     if (res.ok) {
-        const user = await res.json();
-        currentUserId.value = user.id;
-        newOrder.value.driverId = user.id; // Default to self
+        const companyAccount = await res.json();
+        currentCompanyAccountId.value = companyAccount.id;
+        newOrder.value.driverId = companyAccount.id; // Default to self
     }
   } catch (e) {
-    console.error("Failed to fetch user", e);
+    console.error("Failed to fetch company account", e);
   }
 }
 
@@ -173,7 +173,7 @@ function logout() {
     <header>
       <h1>Fleet Dashboard</h1>
       <div class="actions">
-        <span>User ID: {{ currentUserId }}</span>
+        <span>Company Account ID: {{ currentCompanyAccountId }}</span>
         <button @click="refreshData">Refresh</button>
         <button @click="logout" class="secondary">Logout</button>
       </div>

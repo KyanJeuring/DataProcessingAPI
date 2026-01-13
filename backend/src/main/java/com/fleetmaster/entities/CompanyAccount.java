@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "company_account")
-public class User {
+public class CompanyAccount {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

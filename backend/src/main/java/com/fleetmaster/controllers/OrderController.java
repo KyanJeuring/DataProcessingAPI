@@ -2,7 +2,7 @@ package com.fleetmaster.controllers;
 
 import com.fleetmaster.dtos.AddProgressDto;
 import com.fleetmaster.dtos.CreateOrderDto;
-import com.fleetmaster.entities.User;
+import com.fleetmaster.entities.CompanyAccount;
 import com.fleetmaster.services.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,23 +22,23 @@ public class OrderController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createOrder(@RequestBody CreateOrderDto dto, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        if (user.getCompanyId() == null) {
-            return ResponseEntity.badRequest().body("User does not belong to a company");
+        CompanyAccount companyAccount = (CompanyAccount) authentication.getPrincipal();
+        if (companyAccount.getCompanyId() == null) {
+            return ResponseEntity.badRequest().body("CompanyAccount does not belong to a company");
         }
         
-        Long orderId = orderService.createOrder(user.getCompanyId(), dto);
+        Long orderId = orderService.createOrder(companyAccount.getCompanyId(), dto);
         return ResponseEntity.ok(Map.of("message", "Order created", "orderId", orderId));
     }
 
     @PostMapping("/progress")
     public ResponseEntity<?> addProgress(@RequestBody AddProgressDto dto, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        if (user.getCompanyId() == null) {
-            return ResponseEntity.badRequest().body("User does not belong to a company");
+        CompanyAccount companyAccount = (CompanyAccount) authentication.getPrincipal();
+        if (companyAccount.getCompanyId() == null) {
+            return ResponseEntity.badRequest().body("CompanyAccount does not belong to a company");
         }
 
-        Long progressId = orderService.addProgress(user.getCompanyId(), dto);
+        Long progressId = orderService.addProgress(companyAccount.getCompanyId(), dto);
         return ResponseEntity.ok(Map.of("message", "Progress added", "progressId", progressId));
     }
 }

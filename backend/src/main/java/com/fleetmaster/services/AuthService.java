@@ -3,8 +3,8 @@ package com.fleetmaster.services;
 import com.fleetmaster.dtos.LoginDto;
 import com.fleetmaster.dtos.RegisterDto;
 import com.fleetmaster.dtos.VerifyCodeDto;
-import com.fleetmaster.entities.User;
-import com.fleetmaster.repositories.UserRepository;
+import com.fleetmaster.entities.CompanyAccount;
+import com.fleetmaster.repositories.CompanyAccountRepository;
 import com.fleetmaster.security.JwtUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -19,7 +19,7 @@ import java.util.Random;
 @Service
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final CompanyAccountRepository CompanyAccountRepository;
     private final EmailService emailService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
@@ -30,12 +30,12 @@ public class AuthService {
     private final Random random = new SecureRandom();
 
     public AuthService(
-            UserRepository repo,
+            CompanyAccountRepository repo,
             EmailService emailService,
             JwtUtil jwtUtil,
             PasswordEncoder passwordEncoder
     ) {
-        this.userRepository = repo;
+        this.CompanyAccountRepository = repo;
         this.emailService = emailService;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
@@ -43,7 +43,7 @@ public class AuthService {
 
     @Transactional
     public void register(RegisterDto dto) {
-        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+        if (CompanyAccountRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
 
@@ -67,101 +67,101 @@ public class AuthService {
             }
         }
 
-        User user = new User();
-        user.setName(dto.getName()); 
-        user.setEmail(dto.getEmail());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setStatus("ACTIVE");
-        user.setVerified(false);
-        user.setCompanyId(companyId);
+        CompanyAccount companyAccount = new CompanyAccount();
+        companyAccount.setName(dto.getName()); 
+        companyAccount.setEmail(dto.getEmail());
+        companyAccount.setPassword(passwordEncoder.encode(dto.getPassword()));
+        companyAccount.setStatus("ACTIVE");
+        companyAccount.setVerified(false);
+        companyAccount.setCompanyId(companyId);
 
-        user.setLoginAttempts(0);
-        user.setVerifyAttempts(0);
+        companyAccount.setLoginAttempts(0);
+        companyAccount.setVerifyAttempts(0);
 
         String code = generateVerificationCode();
-        user.setVerificationCode(code);
+        companyAccount.setVerificationCode(code);
 
-        userRepository.save(user);
+        CompanyAccountRepository.save(companyAccount);
         emailService.sendVerificationCode(dto.getEmail(), code);
     }
 
     public void sendVerifyCode(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        CompanyAccount companyAccount = CompanyAccountRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("CompanyAccount not found"));
 
-        if ("BLOCKED".equals(user.getStatus())) { // If column is "BLOCKED"
-            throw new RuntimeException("User is blocked");
+        if ("BLOCKED".equals(companyAccount.getStatus())) { // If column is "BLOCKED"
+            throw new RuntimeException("CompanyAccount is blocked");
         }
 
         String code = generateVerificationCode();
-        user.setVerificationCode(code);
+        companyAccount.setVerificationCode(code);
 
-        user.setVerifyAttempts(0);
+        companyAccount.setVerifyAttempts(0);
 
-        userRepository.save(user);
+        CompanyAccountRepository.save(companyAccount);
         emailService.sendVerificationCode(email, code);
     }
 
     public void checkVerifyCode(VerifyCodeDto dto) {
-        User user = userRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        CompanyAccount companyAccount = CompanyAccountRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new RuntimeException("CompanyAccount not found"));
 
-        if ("BLOCKED".equals(user.getStatus())) {
-            throw new RuntimeException("User is blocked");
+        if ("BLOCKED".equals(companyAccount.getStatus())) {
+            throw new RuntimeException("CompanyAccount is blocked");
         }
         
-        String savedCode = user.getVerificationCode();
+        String savedCode = companyAccount.getVerificationCode();
         if (savedCode != null && savedCode.equals(dto.getCode())) {
-            user.setVerified(true);
-            user.setVerifyAttempts(0);
-            user.setVerificationCode(null); 
+            companyAccount.setVerified(true);
+            companyAccount.setVerifyAttempts(0);
+            companyAccount.setVerificationCode(null); 
         } else {
-            user.setVerifyAttempts(user.getVerifyAttempts() + 1);
-            if (user.getVerifyAttempts() >= 3) {
-                user.setStatus("BLOCKED");
+            companyAccount.setVerifyAttempts(companyAccount.getVerifyAttempts() + 1);
+            if (companyAccount.getVerifyAttempts() >= 3) {
+                companyAccount.setStatus("BLOCKED");
             }
         }
 
-        userRepository.save(user);
+        CompanyAccountRepository.save(companyAccount);
     }
 
     public String login(LoginDto dto) {
-        User user = userRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        CompanyAccount companyAccount = CompanyAccountRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new RuntimeException("CompanyAccount not found"));
 
-        if (!user.isVerified()) {
+        if (!companyAccount.isVerified()) {
             throw new RuntimeException("Email not verified");
         }
 
-        if ("BLOCKED".equals(user.getStatus())) {
+        if ("BLOCKED".equals(companyAccount.getStatus())) {
             throw new RuntimeException("Account blocked");
         }
 
         // Check temp lock
-        if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now())) {
-            throw new RuntimeException("Account temporarily locked until " + user.getLockedUntil());
+        if (companyAccount.getLockedUntil() != null && companyAccount.getLockedUntil().isAfter(LocalDateTime.now())) {
+            throw new RuntimeException("Account temporarily locked until " + companyAccount.getLockedUntil());
         }
 
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            user.setLoginAttempts(user.getLoginAttempts() + 1);
-            if (user.getLoginAttempts() >= 3) {
+        if (!passwordEncoder.matches(dto.getPassword(), companyAccount.getPassword())) {
+            companyAccount.setLoginAttempts(companyAccount.getLoginAttempts() + 1);
+            if (companyAccount.getLoginAttempts() >= 3) {
                 // Lock for 15 minutes
-                user.setLockedUntil(LocalDateTime.now().plusMinutes(15));
-                user.setLoginAttempts(0);
+                companyAccount.setLockedUntil(LocalDateTime.now().plusMinutes(15));
+                companyAccount.setLoginAttempts(0);
             }
-            userRepository.save(user);
+            CompanyAccountRepository.save(companyAccount);
             throw new RuntimeException("Incorrect password");
         }
 
-        user.setLoginAttempts(0);
-        user.setLockedUntil(null);
-        userRepository.save(user);
+        companyAccount.setLoginAttempts(0);
+        companyAccount.setLockedUntil(null);
+        CompanyAccountRepository.save(companyAccount);
 
-        return jwtUtil.generateToken(user.getEmail());
+        return jwtUtil.generateToken(companyAccount.getEmail());
     }
 
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+    public CompanyAccount getCompanyAccountByEmail(String email) {
+        return CompanyAccountRepository.findByEmail(email).orElse(null);
     }
 
     private String generateVerificationCode() {

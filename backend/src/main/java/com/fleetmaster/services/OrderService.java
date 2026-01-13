@@ -38,7 +38,7 @@ public class OrderService {
         Object pickUpPoint = createPoint(dto.getPickUpLat(), dto.getPickUpLon());
         Object deliveryPoint = createPoint(dto.getDeliveryLat(), dto.getDeliveryLon());
 
-        // 3. Call SP
+        // 3. Call SP (Stored Procedure)
         // sp_create_order(p_vehicle_id, p_driver_id, p_pick_up, p_delivery, p_load_type, p_departure_time, p_arrival_time)
         Number orderId = (Number) entityManager.createNativeQuery(
                 "SELECT sp_create_order(:vid, :did, CAST(:pickup AS point), CAST(:delivery AS point), CAST(:ltype AS load_type), :dtime, :atime)")

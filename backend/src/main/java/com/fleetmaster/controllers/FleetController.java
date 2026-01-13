@@ -1,6 +1,6 @@
 package com.fleetmaster.controllers;
 
-import com.fleetmaster.entities.User;
+import com.fleetmaster.entities.CompanyAccount;
 import com.fleetmaster.services.FleetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,28 +25,28 @@ public class FleetController {
 
     @GetMapping("/status")
     public ResponseEntity<?> getFleetStatus(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        if (user.getCompanyId() == null) {
-            return ResponseEntity.badRequest().body("User does not belong to a company.");
+        CompanyAccount companyAccount = (CompanyAccount) authentication.getPrincipal();
+        if (companyAccount.getCompanyId() == null) {
+            return ResponseEntity.badRequest().body("Company account does not belong to a company.");
         }
-        return ResponseEntity.ok(fleetService.getFleetStatus(user.getCompanyId()));
+        return ResponseEntity.ok(fleetService.getFleetStatus(companyAccount.getCompanyId()));
     }
 
     @GetMapping("/tracking")
     public ResponseEntity<?> getOrderTracking(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-         if (user.getCompanyId() == null) {
-            return ResponseEntity.badRequest().body("User does not belong to a company.");
+        CompanyAccount companyAccount = (CompanyAccount) authentication.getPrincipal();
+        if (companyAccount.getCompanyId() == null) {
+            return ResponseEntity.badRequest().body("Company account does not belong to a company.");
         }
-        return ResponseEntity.ok(fleetService.getOrderTracking(user.getCompanyId()));
+        return ResponseEntity.ok(fleetService.getOrderTracking(companyAccount.getCompanyId()));
     }
 
     @GetMapping("/subscription")
     public ResponseEntity<?> getSubscription(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-         if (user.getCompanyId() == null) {
-            return ResponseEntity.badRequest().body("User does not belong to a company.");
+        CompanyAccount companyAccount = (CompanyAccount) authentication.getPrincipal();
+        if (companyAccount.getCompanyId() == null) {
+            return ResponseEntity.badRequest().body("Company account does not belong to a company.");
         }
-        return ResponseEntity.ok(fleetService.getSubscriptionUsage(user.getCompanyId()));
+        return ResponseEntity.ok(fleetService.getSubscriptionUsage(companyAccount.getCompanyId()));
     }
 }

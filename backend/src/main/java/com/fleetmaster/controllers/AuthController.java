@@ -19,7 +19,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterDto dto) {
         authService.register(dto);
-        return ResponseEntity.ok("User registered. Verification code sent.");
+        return ResponseEntity.ok("Company account registered. Verification code sent.");
     }
 
     @PostMapping("/login")

@@ -1,6 +1,6 @@
 package com.fleetmaster.security;
 
-import com.fleetmaster.entities.User;
+import com.fleetmaster.entities.CompanyAccount;
 import com.fleetmaster.services.AuthService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,10 +39,10 @@ public class JwtFilter extends OncePerRequestFilter {
         String email = jwtUtil.extractEmail(token);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-          User user = authService.getUserByEmail(email);
-          if (user != null && jwtUtil.validateToken(token, user.getEmail())) {
+          CompanyAccount companyAccount = authService.getCompanyAccountByEmail(email);
+          if (companyAccount != null && jwtUtil.validateToken(token, companyAccount.getEmail())) {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                user, null, Collections.emptyList());
+                companyAccount, null, Collections.emptyList());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
           }

@@ -23,13 +23,13 @@ public class InfoController {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).body("Unauthorized");
         }
-               
-        User user = (User) authentication.getPrincipal();
-        if (!user.isVerified()) {
-            return ResponseEntity.status(403).body("User not verified");
+        
+        CompanyAccount companyAccount = (CompanyAccount) authentication.getPrincipal();
+        if (!companyAccount.isVerified()) {
+            return ResponseEntity.status(403).body("Company account not verified");
         }
-        if ("BLOCKED".equals(user.getStatus())) {
-            return ResponseEntity.status(403).body("User blocked");
+        if ("BLOCKED".equals(companyAccount.getStatus())) {
+            return ResponseEntity.status(403).body("Company account blocked");
         }
 
         List<Info> infos = infoService.getAll();
