@@ -1,6 +1,7 @@
 package com.fleetmaster.entities;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "company_account")
@@ -14,10 +15,10 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "passwordhash", nullable = false)
+    @Column(name = "password_hash", nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(name = "is_verified", nullable = false)
     private boolean verified = false;
 
     @Column(name = "login_attempts", nullable = false)
@@ -26,11 +27,14 @@ public class User {
     @Column(name = "verify_attempts", nullable = false)
     private int verifyAttempts = 0;
 
-    @Column(name = "isactive")
+    @Column(name = "account_status")
     private String status = "ACTIVE"; // ACTIVE or BLOCKED
 
     @Column(name = "verification_code", length = 4)
     private String verificationCode;
+
+    @Column(name = "locked_until")
+    private LocalDateTime lockedUntil;
 
     // Getters / setters
     public Long getId() { return id; }
@@ -51,4 +55,6 @@ public class User {
     public void setStatus(String status) { this.status = status; }
     public String getVerificationCode() { return verificationCode; }
     public void setVerificationCode(String verificationCode) { this.verificationCode = verificationCode; }
+    public LocalDateTime getLockedUntil() { return lockedUntil; }
+    public void setLockedUntil(LocalDateTime lockedUntil) { this.lockedUntil = lockedUntil; }
 }

@@ -106,6 +106,15 @@ CREATE TABLE IF NOT EXISTS company_account (
     first_name VARCHAR,
     last_name VARCHAR,
     is_active BOOLEAN DEFAULT TRUE,
+    
+    -- Added columns for security requirements
+    is_verified BOOLEAN DEFAULT FALSE,
+    verification_code VARCHAR,
+    login_attempts INT DEFAULT 0,
+    verify_attempts INT DEFAULT 0,
+    locked_until TIMESTAMP,
+    account_status VARCHAR DEFAULT 'ACTIVE',
+
     date_created TIMESTAMP DEFAULT NOW(),
     roles user_role[] NOT NULL DEFAULT ARRAY[]::user_role[],
     preferences JSONB

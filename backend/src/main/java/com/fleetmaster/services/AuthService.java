@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.Random;
 
 @Service
@@ -108,16 +109,24 @@ public class AuthService {
             throw new RuntimeException("Account blocked");
         }
 
+        // Check temp lock
+        if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now())) {
+            throw new RuntimeException("Account temporarily locked until " + user.getLockedUntil());
+        }
+
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             user.setLoginAttempts(user.getLoginAttempts() + 1);
             if (user.getLoginAttempts() >= 3) {
-                user.setStatus("BLOCKED");
+                // Lock for 15 minutes
+                user.setLockedUntil(LocalDateTime.now().plusMinutes(15));
+                user.setLoginAttempts(0);
             }
             userRepository.save(user);
             throw new RuntimeException("Incorrect password");
         }
 
         user.setLoginAttempts(0);
+        user.setLockedUntil(null);
         userRepository.save(user);
 
         return jwtUtil.generateToken(user.getEmail());
