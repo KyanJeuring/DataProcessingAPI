@@ -2,6 +2,18 @@
 import { ref } from "vue";
 import { RouterLink, RouterView } from "vue-router";
 
+const helloStatus = ref("");
+
+const listStatus = ref("");
+const companies = ref([]);
+
+const companyName = ref("");
+const companyLicense = ref("");
+const companyDiscount = ref(false);
+
+const companySubmitting = ref(false);
+const companyStatus = ref("");
+
 const message = ref("");
 const name = ref("");
 const loading = ref(false);
