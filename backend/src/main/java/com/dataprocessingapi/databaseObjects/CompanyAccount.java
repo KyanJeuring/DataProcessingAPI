@@ -1,8 +1,6 @@
-package main.java.com.dataprocessingapi.databaseObjects;
+package com.dataprocessingapi.databaseObjects;
 
 import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class CompanyAccount {
     private String emailAddress;
@@ -12,11 +10,8 @@ public class CompanyAccount {
     private boolean isBlocked;
 
     public CompanyAccount(String emailAddress, String password) {
-        this.setEmailAddress(emailAddress);
-        this.setPassword(password);
-        this.profiles = new HashSet<>();
-        this.isVerified = false;
-        this.isBlocked = false;
+        this.emailAddress = emailAddress;
+        this.password = password;
     }
 
     public String getEmailAddress() {
@@ -24,18 +19,6 @@ public class CompanyAccount {
     }
 
     public void setEmailAddress(String emailAddress) {
-        if (emailAddress == null || emailAddress.trim().isEmpty()) {
-            throw new IllegalArgumentException("Email address cannot be null or empty");
-        }
-
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-        Pattern pattern = Pattern.compile(emailRegex);
-        Matcher matcher = pattern.matcher(emailAddress);
-
-        if (!matcher.matches()) {
-            throw new IllegalArgumentException("Invalid email address format: " + emailAddress);
-        }
-
         this.emailAddress = emailAddress;
     }
 
@@ -44,26 +27,6 @@ public class CompanyAccount {
     }
 
     public void setPassword(String password) {
-        if (password == null) {
-            throw new IllegalArgumentException("Password cannot be null");
-        }
-
-        if (password.length() < 8) {
-            throw new IllegalArgumentException("Password must be at least 8 characters long");
-        }
-
-        if (!password.matches(".*[A-Z].*")) {
-            throw new IllegalArgumentException("Password must contain at least one uppercase letter");
-        }
-
-        if (!password.matches(".*\\d.*")) {
-            throw new IllegalArgumentException("Password must contain at least one number");
-        }
-
-        if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")) {
-            throw new IllegalArgumentException("Password must contain at least one special character");
-        }
-
         this.password = password;
     }
 
@@ -71,12 +34,8 @@ public class CompanyAccount {
         return this.profiles;
     }
 
-    public void addProfile(Profile profile) {
-        if (profile == null) {
-            throw new IllegalArgumentException("Please provide a valid profile.");
-        }
-
-        this.profiles.add(profile);
+    public void setProfiles(HashSet<Profile> profiles) {
+        this.profiles = profiles;
     }
 
     public boolean isVerified() {

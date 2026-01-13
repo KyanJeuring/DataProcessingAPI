@@ -1,4 +1,4 @@
-package main.java.com.dataprocessingapi.databaseObjects;
+package com.dataprocessingapi.databaseObjects;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

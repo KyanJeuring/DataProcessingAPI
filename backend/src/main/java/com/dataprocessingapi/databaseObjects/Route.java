@@ -1,4 +1,4 @@
-package main.java.com.dataprocessingapi.databaseObjects;
+package com.dataprocessingapi.databaseObjects;
 
 import java.util.HashSet;
 
@@ -9,10 +9,9 @@ public class Route {
     private HashSet<RouteCheckpoint> routeCheckpoints;
 
     public Route(String startingLocation, String destinationLocation, double maxTravelTime) {
-        this.setStartingLocation(startingLocation);
-        this.setDestinationLocation(destinationLocation);
-        this.setMaxTravelTime(maxTravelTime);
-        this.routeCheckpoints = new HashSet<>();
+        this.startingLocation = startingLocation;
+        this.destinationLocation = destinationLocation;
+        this.maxTravelTime = maxTravelTime;
     }
 
     public String getStartingLocation() {
@@ -20,10 +19,6 @@ public class Route {
     }
 
     public void setStartingLocation(String startingLocation) {
-        if (startingLocation == null) {
-            throw new IllegalArgumentException("Please provide a starting location.");
-        }
-
         this.startingLocation = startingLocation;
     }
 
@@ -32,10 +27,6 @@ public class Route {
     }
 
     public void setDestinationLocation(String destinationLocation) {
-        if (destinationLocation == null) {
-            throw new IllegalArgumentException("Please provide a destination.");
-        }
-
         this.destinationLocation = destinationLocation;
     }
 
@@ -44,10 +35,6 @@ public class Route {
     }
 
     public void setMaxTravelTime(double maxTravelTime) {
-        if (maxTravelTime < 0) {
-            throw new IllegalArgumentException("The travel time cannot be a negative number.");
-        }
-
         this.maxTravelTime = maxTravelTime;
     }
 
@@ -55,11 +42,7 @@ public class Route {
         return this.routeCheckpoints;
     }
 
-    public void addRouteCheckpoints(RouteCheckpoint routeCheckpoint) {
-        if (routeCheckpoint == null) {
-            throw new IllegalArgumentException("Please provide a valid route checkpoint.");
-        }
-
-        this.routeCheckpoints.add(routeCheckpoint);
+    public void setRouteCheckpoints(HashSet<RouteCheckpoint> routeCheckpoints) {
+        this.routeCheckpoints = routeCheckpoints;
     }
 }

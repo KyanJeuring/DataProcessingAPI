@@ -1,43 +1,31 @@
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
+import { RouterLink, RouterView } from "vue-router";
 
-const message = ref('')
-const name = ref('')
-const loading = ref(false)
-const helloStatus = ref('')
-
-// Company form state
-const companyName = ref('')
-const companyLicense = ref('')
-const companyDiscount = ref(false)
-const companySubmitting = ref(false)
-const companies = ref([])
-const companyStatus = ref('')
-const listStatus = ref('')
+const message = ref("");
+const name = ref("");
+const loading = ref(false);
 
 function getBackendBase() {
   // Vite-proxied path by default (set in docker-compose to `/api`)
-  return import.meta.env.VITE_BACKEND_URL || '/api'
+  return import.meta.env.VITE_BACKEND_URL || "/api";
 }
 
 async function submit(e) {
-  e.preventDefault()
-  message.value = ''
-  loading.value = true
+  e.preventDefault();
+  message.value = "";
+  loading.value = true;
   try {
-    const base = getBackendBase().replace(/\/$/, '')
-    const url = `${base}/hello${name.value ? `?name=${encodeURIComponent(name.value)}` : ''}`
-    const res = await fetch(url)
-    helloStatus.value = `${res.status} ${res.statusText}`
-    console.log('[HELLO]', res.status, res.statusText)
-    if (!res.ok) throw new Error(`status=${res.status}`)
-    message.value = await res.text()
+    const base = getBackendBase().replace(/\/$/, "");
+    const url = `${base}/hello${name.value ? `?name=${encodeURIComponent(name.value)}` : ""}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`status=${res.status}`);
+    message.value = await res.text();
   } catch (err) {
-    console.error(err)
-    message.value = 'Error contacting backend'
-    if (!helloStatus.value) helloStatus.value = 'Request failed'
+    console.error(err);
+    message.value = "Error contacting backend";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
@@ -95,8 +83,11 @@ loadCompanies()
 <template>
   <section>
     <h1>Data Processing API</h1>
-    <p>This is a simple frontend to demonstrate communication with the backend API.</p>
-    <hr>
+    <p>
+      This is a simple frontend to demonstrate communication with the backend
+      API.
+    </p>
+    <hr />
     <p>The front-end runs on Vue.js + Vite.</p>
     <p>The backend runs on Java + Spring Boot.</p>
   </section>
@@ -149,4 +140,12 @@ loadCompanies()
       </ul>
     </div>
   </section>
+  
+  <nav>
+    <RouterLink to="/signup">Signup</RouterLink>
+    |
+    <RouterLink to="/login">Login</RouterLink>
+  </nav>
+
+  <RouterView />
 </template>

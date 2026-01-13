@@ -1,4 +1,4 @@
-package main.java.com.dataprocessingapi.databaseObjects;
+package com.dataprocessingapi.databaseObjects;
 
 import java.time.LocalDate;
 
@@ -9,9 +9,9 @@ public class Licence {
     private boolean hasDiscount;
 
     public Licence(LicenceType licenceType, LocalDate activationDate, LocalDate expirationDate) {
-        this.setLicenceType(licenceType);
-        this.setActivationDate(activationDate);
-        this.setExpirationDate(expirationDate);
+        this.licenceType = licenceType;
+        this.activationDate = activationDate;
+        this.expirationDate = expirationDate;
     }
 
     public LicenceType getLicenceType() {
@@ -19,10 +19,6 @@ public class Licence {
     }
 
     public void setLicenceType(LicenceType licenceType) {
-        if (licenceType == null) {
-            throw new IllegalArgumentException("Please provide a license type object.");
-        }
-
         this.licenceType = licenceType;
     }
 
@@ -31,10 +27,6 @@ public class Licence {
     }
 
     public void setActivationDate(LocalDate activationDate) {
-        if (activationDate == null) {
-            throw new IllegalArgumentException("Please provide an appropriate activation date.");
-        }
-
         this.activationDate = activationDate;
     }
 
@@ -43,10 +35,6 @@ public class Licence {
     }
 
     public void setExpirationDate(LocalDate expirationDate) {
-        if (expirationDate == null) {
-            throw new IllegalArgumentException("Please provide an appropriate expiration date.");
-        }
-
         this.expirationDate = expirationDate;
     }
 

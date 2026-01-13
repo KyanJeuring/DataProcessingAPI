@@ -1,4 +1,4 @@
-package main.java.com.dataprocessingapi.databaseObjects;
+package com.dataprocessingapi.databaseObjects;
 
 import java.time.LocalDate;
 
@@ -11,8 +11,8 @@ public class Invitation {
     private int validityPeriod;
 
     public Invitation(CompanyAccount inviter, int validityPeriod) {
-        this.setInviter(inviter);
-        this.setValidityPeriod(validityPeriod);
+        this.inviter = inviter;
+        this.validityPeriod = validityPeriod;
     }
 
     public CompanyAccount getInviter() {
@@ -20,10 +20,6 @@ public class Invitation {
     }
 
     public void setInviter(CompanyAccount inviter) {
-        if (inviter == null) {
-            throw new IllegalArgumentException("Please provide an company account object.");
-        }
-
         this.inviter = inviter;
     }
 
@@ -32,10 +28,6 @@ public class Invitation {
     }
 
     public void setInvitee(CompanyAccount invitee) {
-        if (invitee == null) {
-            throw new IllegalArgumentException("Please provide a company account object.");
-        }
-
         this.invitee = invitee;
     }
 
@@ -44,16 +36,6 @@ public class Invitation {
     }
 
     public void setSentDate(LocalDate sentDate) {
-        if (sentDate == null) {
-            throw new IllegalArgumentException("sentDate cannot be null");
-        }
-
-        if (sentDate.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException(
-                    "sentDate cannot be in the future: " + sentDate
-            );
-        }
-        
         this.sentDate = sentDate;
     }
 
@@ -78,10 +60,6 @@ public class Invitation {
     }
 
     public void setValidityPeriod(int validityPeriod) {
-        if (validityPeriod < 1) {
-            throw new IllegalArgumentException("The invitation must be valid for at least 1 day.");
-        }
-
         this.validityPeriod = validityPeriod;
     }
 }

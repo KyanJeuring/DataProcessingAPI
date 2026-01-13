@@ -1,4 +1,4 @@
-package main.java.com.dataprocessingapi.databaseObjects;
+package com.dataprocessingapi.databaseObjects;
 
 import java.util.HashSet;
 
@@ -15,35 +15,23 @@ public class Driver {
         return this.vehicles;
     }
 
-    public void addVehicle(Vehicle vehicle) {
-        if (vehicle == null) {
-            throw new IllegalArgumentException("Please provide a vehicle object.");
-        }
-
-        this.vehicles.add(vehicle);
+    public void setVehicles(HashSet<Vehicle> vehicles) {
+        this.vehicles = vehicles;
     }
 
     public HashSet<TransportOrder> getCurrentOrders() {
         return this.currentOrders;
     }
 
-    public void addCurrentOrder(TransportOrder currentOrder) {
-        if (currentOrder == null) {
-            throw new IllegalArgumentException("Please provide a transport order object.");
-        }
-
-        this.currentOrders.add(currentOrder);
+    public void setCurrentOrders(HashSet<TransportOrder> currentOrders) {
+        this.currentOrders = currentOrders;
     }
 
     public HashSet<TransportOrder> getFutureOrders() {
         return this.futureOrders;
     }
 
-    public void addFutureOrder(TransportOrder futureOrder) {
-        if (futureOrder == null) {
-            throw new IllegalArgumentException("Please provide a transport order object.");
-        }
-
-        this.futureOrders.add(futureOrder);
+    public void setFutureOrders(HashSet<TransportOrder> futureOrders) {
+        this.futureOrders = futureOrders;
     }
 }

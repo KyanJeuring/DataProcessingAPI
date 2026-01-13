@@ -1,4 +1,4 @@
-package main.java.com.dataprocessingapi.databaseObjects;
+package com.dataprocessingapi.databaseObjects;
 
 public class Profile {
     private String name;
@@ -6,9 +6,9 @@ public class Profile {
     private String location;
 
     public Profile(String name, Employee role, String location) {
-        this.setName(name);
-        this.setRole(role);
-        this.setLocation(location);
+        this.name = name;
+        this.role = role;
+        this.location = location;
     }
 
     public String getName() {
@@ -16,10 +16,6 @@ public class Profile {
     }
 
     public void setName(String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("Please provide a name.");
-        }
-
         this.name = name;
     }
 
@@ -28,11 +24,7 @@ public class Profile {
     }
 
     public void setRole(Employee role) {
-        if (role == null) {
-            throw new IllegalArgumentException("Please provide a role.");
-        }
-
-        this.setRole(role);
+        this.role = role;
     }
 
     public String getLocation() {
@@ -40,10 +32,6 @@ public class Profile {
     }
 
     public void setLocation(String location) {
-        if (location == null) {
-            throw new IllegalArgumentException("Please provide a location.");
-        }
-
         this.location = location;
     }
 }
