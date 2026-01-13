@@ -61,7 +61,7 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if ("BLOCKED".equals(user.getStatus())) {
+        if ("BLOCKED".equals(user.getStatus())) { // If column is "BLOCKED"
             throw new RuntimeException("User is blocked");
         }
 
