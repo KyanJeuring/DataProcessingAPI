@@ -10,6 +10,7 @@ public class RegisterDto {
     private String password;
     private String firstName;
     private String lastName;
+    private String companyName;
     private UserRole[] roles;
     private Map<String, Object> preferences;
 
@@ -53,6 +54,14 @@ public class RegisterDto {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
     public UserRole[] getRoles() {

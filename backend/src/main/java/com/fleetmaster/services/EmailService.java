@@ -26,6 +26,10 @@ public class EmailService {
         msg.setTo(to);
         msg.setSubject("FleetMaster Verification Code");
         msg.setText("Your verification code: " + code);
-        mailSender.send(msg);
+        try {
+            mailSender.send(msg);
+        } catch (Exception ex) {
+            logger.warn("Email send failed, proceeding without email: {}", ex.getMessage());
+        }
     }
 }

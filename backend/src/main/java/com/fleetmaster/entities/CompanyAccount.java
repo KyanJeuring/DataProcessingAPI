@@ -60,8 +60,7 @@ public class CompanyAccount {
     private LocalDateTime dateCreated;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Column(name = "roles", columnDefinition = "user_role[]")
+    @Column(name = "roles", columnDefinition = "user_role[]", insertable = false, updatable = false)
     private UserRole[] roles;
 
     @JdbcTypeCode(SqlTypes.JSON)
