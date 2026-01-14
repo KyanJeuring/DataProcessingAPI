@@ -1,4 +1,5 @@
 <script setup>
+import "../style/loginview.css";
 import { ref } from "vue";
 
 const email = ref(sessionStorage.getItem("pendingEmail") || "");
@@ -20,7 +21,7 @@ async function login() {
       }),
     });
 
-    if (!res.ok) throw new Error("Login failed");
+    if (!res.ok) throw new Error("Invalid email or password");
 
     const data = await res.json();
     if (data.token) {
@@ -34,18 +35,21 @@ async function login() {
 </script>
 
 <template>
-  <h2>Login</h2>
+  <div class="login-page">
+    <div class="login-card">
+      <h2>FleetMaster Login</h2>
+      <p class="login-subtitle">Access your dashboard</p>
 
-  <form @submit.prevent="login">
-    <input v-model="email" type="email" placeholder="Email" />
-    <input v-model="password" type="password" placeholder="Password" />
-    <button type="submit">Login</button>
-  </form>
+      <form @submit.prevent="login">
+        <input v-model="email" type="email" placeholder="Email" required/>
+        <input v-model="password" type="password" placeholder="Password" required/>
+        <button type="submit">Login</button>
+      </form>
 
-  <p>
-    Don't have an account?
-    <a href="/signup">Sign up</a>
-  </p>
-
-  <p>{{ error }}</p>
+      <div class="login-footer">
+        <p>Don't have an account?<a href="/signup">Sign up</a></p>
+      </div>
+      <p v-if="error" class="login-error">{{ error }}</p>
+    </div>
+  </div>
 </template>

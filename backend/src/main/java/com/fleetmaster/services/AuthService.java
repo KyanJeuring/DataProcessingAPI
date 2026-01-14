@@ -68,10 +68,16 @@ public class AuthService {
         }
 
         CompanyAccount companyAccount = new CompanyAccount();
-        companyAccount.setName(dto.getName()); 
+        companyAccount.setUsername(dto.getUsername()); 
         companyAccount.setEmail(dto.getEmail());
-        companyAccount.setPassword(passwordEncoder.encode(dto.getPassword()));
-        companyAccount.setStatus("ACTIVE");
+        companyAccount.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
+
+        companyAccount.setFirstName(dto.getFirstName());
+        companyAccount.setLastName(dto.getLastName());
+        companyAccount.setRoles(dto.getRoles());                    
+        companyAccount.setPreferences(dto.getPreferences());
+
+        companyAccount.setAccountStatus("ACTIVE");
         companyAccount.setVerified(false);
         companyAccount.setCompanyId(companyId);
 
@@ -89,7 +95,7 @@ public class AuthService {
         CompanyAccount companyAccount = CompanyAccountRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("CompanyAccount not found"));
 
-        if ("BLOCKED".equals(companyAccount.getStatus())) { // If column is "BLOCKED"
+        if ("BLOCKED".equals(companyAccount.getAccountStatus())) { 
             throw new RuntimeException("CompanyAccount is blocked");
         }
 
@@ -106,7 +112,7 @@ public class AuthService {
         CompanyAccount companyAccount = CompanyAccountRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new RuntimeException("CompanyAccount not found"));
 
-        if ("BLOCKED".equals(companyAccount.getStatus())) {
+        if ("BLOCKED".equals(companyAccount.getAccountStatus())) {
             throw new RuntimeException("CompanyAccount is blocked");
         }
         
@@ -118,7 +124,7 @@ public class AuthService {
         } else {
             companyAccount.setVerifyAttempts(companyAccount.getVerifyAttempts() + 1);
             if (companyAccount.getVerifyAttempts() >= 3) {
-                companyAccount.setStatus("BLOCKED");
+                companyAccount.setAccountStatus("BLOCKED");
             }
         }
 
@@ -133,7 +139,7 @@ public class AuthService {
             throw new RuntimeException("Email not verified");
         }
 
-        if ("BLOCKED".equals(companyAccount.getStatus())) {
+        if ("BLOCKED".equals(companyAccount.getAccountStatus())) {
             throw new RuntimeException("Account blocked");
         }
 
@@ -142,7 +148,7 @@ public class AuthService {
             throw new RuntimeException("Account temporarily locked until " + companyAccount.getLockedUntil());
         }
 
-        if (!passwordEncoder.matches(dto.getPassword(), companyAccount.getPassword())) {
+        if (!passwordEncoder.matches(dto.getPassword(), companyAccount.getPasswordHash())) {
             companyAccount.setLoginAttempts(companyAccount.getLoginAttempts() + 1);
             if (companyAccount.getLoginAttempts() >= 3) {
                 // Lock for 15 minutes

@@ -1,13 +1,18 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-
+import "../style/signupview.css";
 const router = useRouter();
 
-const name = ref("");
+const username = ref("");
+const firstName = ref("");
+const lastName = ref("");
 const email = ref("");
 const password = ref("");
-
+const role = ref("");
+const theme = ref("");                 
+const notifications = ref(null);       
+const language = "en";                
 const message = ref("");
 const error = ref("");
 const loading = ref(false);
@@ -24,9 +29,18 @@ async function signup() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: name.value,
+        username: username.value,
+        firstName: firstName.value,
+        lastName: lastName.value,
         email: email.value,
         password: password.value,
+        roles: [role.value],
+
+        preferences: {
+          theme: theme.value,
+          language,
+          notifications: notifications.value,
+        },
       }),
     });
 
@@ -40,13 +54,10 @@ async function signup() {
         (body && typeof body === "object" && (body.message || body.error)) ||
         (typeof body === "string" && body) ||
         "";
-      throw new Error(`HTTP ${res.status} ${res.statusText}${backendMsg ? ` — ${backendMsg}` : ""}`);
+      throw new Error(
+        `HTTP ${res.status} ${res.statusText}${backendMsg ? ` — ${backendMsg}` : ""}`
+      );
     }
-
-    message.value =
-      (typeof body === "string" && body) ||
-      (body && typeof body === "object" && (body.message || JSON.stringify(body))) ||
-      "Registered. Verification code sent.";
 
     sessionStorage.setItem("pendingEmail", email.value);
     router.push("/verify");
@@ -59,15 +70,64 @@ async function signup() {
 </script>
 
 <template>
-  <h2>Signup</h2>
+  <div class="signup-page">
+    <div class="signup-card">
+      <h2>FleetMaster Signup</h2>
+      <p class="subtitle">Create your company account</p>
 
-  <form @submit.prevent="signup">
-    <input v-model="name" placeholder="Name" required />
-    <input v-model="email" type="email" placeholder="Email" required />
-    <input v-model="password" type="password" placeholder="Password" required />
-    <button type="submit" :disabled="loading">{{ loading ? "..." : "Signup" }}</button>
-  </form>
+      <form @submit.prevent="signup">
+        <div class="row">
+          <input v-model="username" placeholder="Username" required />
+        </div>
 
-  <p v-if="message">{{ message }}</p>
-  <p v-if="error">{{ error }}</p>
+        <div class="row two">
+          <input v-model="firstName" placeholder="First name" required />
+          <input v-model="lastName" placeholder="Last name" required />
+        </div>
+
+        <div class="row">
+          <input v-model="email" type="email" placeholder="Email" required />
+        </div>
+
+        <div class="row">
+          <input v-model="password" type="password" placeholder="Password" required />
+        </div>
+
+        <div class="row">
+          <select v-model="role" required>
+            <option disabled value="">Select role</option>
+            <option value="ADMIN">Admin</option>
+            <option value="MANAGER">Manager</option>
+            <option value="VIEWER">Viewer</option>
+            <option value="DRIVER">Driver</option>
+          </select>
+        </div>
+
+        <div class="preferences">
+          <div class="pref-group">
+            <span>Theme</span>
+            <label><input type="radio" value="light" v-model="theme" required /> Light</label>
+            <label><input type="radio" value="dark" v-model="theme" required /> Dark</label>
+          </div>
+
+          <div class="pref-group">
+            <span>Notifications</span>
+            <label><input type="radio" :value="true" v-model="notifications" required /> Yes</label>
+            <label><input type="radio" :value="false" v-model="notifications" required /> No</label>
+          </div>
+
+          <div class="pref-group disabled">
+            <span>Language</span>
+            <span class="fixed">English (EN)</span>
+          </div>
+        </div>
+
+        <button type="submit" :disabled="loading">
+          {{ loading ? "Creating account..." : "Create Account" }}
+        </button>
+
+        <p v-if="error" class="error">{{ error }}</p>
+      </form>
+    </div>
+  </div>
 </template>
