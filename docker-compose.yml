@@ -36,6 +36,7 @@ services:
       POSTGRES_DB: dataprocessingapi_db
     volumes:
       - postgres:/var/lib/postgresql
+      - ./backend/sql/users.sql:/docker-entrypoint-initdb.d/00-users.sql:ro
       - ./backend/sql/tables.sql:/docker-entrypoint-initdb.d/01-tables.sql:ro
       - ./backend/sql/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
       - ./backend/sql/views.sql:/docker-entrypoint-initdb.d/03-views.sql:ro

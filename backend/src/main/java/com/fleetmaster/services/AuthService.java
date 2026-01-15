@@ -78,7 +78,7 @@ public class AuthService {
         }
 
         CompanyAccount companyAccount = new CompanyAccount();
-        companyAccount.setUsername(dto.getUsername()); 
+        companyAccount.setUsername(dto.getUsername() != null ? dto.getUsername() : dto.getEmail());
         companyAccount.setEmail(dto.getEmail());
         companyAccount.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
 
