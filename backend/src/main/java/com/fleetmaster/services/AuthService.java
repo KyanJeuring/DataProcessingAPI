@@ -4,9 +4,13 @@ import com.fleetmaster.dtos.LoginDto;
 import com.fleetmaster.dtos.RegisterDto;
 import com.fleetmaster.dtos.VerifyCodeDto;
 import com.fleetmaster.entities.CompanyAccount;
+import com.fleetmaster.entities.ApiAccount;
+import com.fleetmaster.exceptions.BusinessException;
 import com.fleetmaster.repositories.CompanyAccountRepository;
+import com.fleetmaster.repositories.ApiAccountRepository;
 import com.fleetmaster.security.JwtUtil;
 import jakarta.persistence.EntityManager;
+
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +23,11 @@ import java.util.Random;
 @Service
 public class AuthService {
 
-    private final CompanyAccountRepository CompanyAccountRepository;
+    private static final String ACCOUNT_BLOCKED = "BLOCKED";
+    private static final String ACCOUNT_NOT_FOUND_MSG = "CompanyAccount not found";
+
+    private final CompanyAccountRepository companyAccountRepository;
+    private final ApiAccountRepository apiAccountRepository;
     private final EmailService emailService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
@@ -31,11 +39,13 @@ public class AuthService {
 
     public AuthService(
             CompanyAccountRepository repo,
+            ApiAccountRepository apiAccountRepository,
             EmailService emailService,
             JwtUtil jwtUtil,
             PasswordEncoder passwordEncoder
     ) {
-        this.CompanyAccountRepository = repo;
+        this.companyAccountRepository = repo;
+        this.apiAccountRepository = apiAccountRepository;
         this.emailService = emailService;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
@@ -43,8 +53,8 @@ public class AuthService {
 
     @Transactional
     public void register(RegisterDto dto) {
-        if (CompanyAccountRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
+        if (companyAccountRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new BusinessException("Email already exists");
         }
 
         Long companyId = null;
@@ -58,12 +68,12 @@ public class AuthService {
                         .setParameter("name", dto.getCompanyName())
                         .getSingleResult();
                 
-                if (result instanceof Number) {
-                    companyId = ((Number) result).longValue();
+                if (result instanceof Number number) {
+                    companyId = number.longValue();
                 }
             } catch (Exception e) {
                 // If company exists or other error
-                throw new RuntimeException("Error creating company: " + e.getMessage());
+                throw new BusinessException("Error creating company: " + e.getMessage());
             }
         }
 
@@ -87,16 +97,16 @@ public class AuthService {
         String code = generateVerificationCode();
         companyAccount.setVerificationCode(code);
 
-        CompanyAccountRepository.save(companyAccount);
+        companyAccountRepository.save(companyAccount);
         emailService.sendVerificationCode(dto.getEmail(), code);
     }
 
     public void sendVerifyCode(String email) {
-        CompanyAccount companyAccount = CompanyAccountRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("CompanyAccount not found"));
+        CompanyAccount companyAccount = companyAccountRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException(ACCOUNT_NOT_FOUND_MSG));
 
-        if ("BLOCKED".equals(companyAccount.getAccountStatus())) { 
-            throw new RuntimeException("CompanyAccount is blocked");
+        if (ACCOUNT_BLOCKED.equals(companyAccount.getAccountStatus())) { 
+            throw new BusinessException("CompanyAccount is blocked");
         }
 
         String code = generateVerificationCode();
@@ -104,16 +114,16 @@ public class AuthService {
 
         companyAccount.setVerifyAttempts(0);
 
-        CompanyAccountRepository.save(companyAccount);
+        companyAccountRepository.save(companyAccount);
         emailService.sendVerificationCode(email, code);
     }
 
     public void checkVerifyCode(VerifyCodeDto dto) {
-        CompanyAccount companyAccount = CompanyAccountRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("CompanyAccount not found"));
+        CompanyAccount companyAccount = companyAccountRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new BusinessException(ACCOUNT_NOT_FOUND_MSG));
 
-        if ("BLOCKED".equals(companyAccount.getAccountStatus())) {
-            throw new RuntimeException("CompanyAccount is blocked");
+        if (ACCOUNT_BLOCKED.equals(companyAccount.getAccountStatus())) {
+            throw new BusinessException("CompanyAccount is blocked");
         }
         
         String savedCode = companyAccount.getVerificationCode();
@@ -124,28 +134,28 @@ public class AuthService {
         } else {
             companyAccount.setVerifyAttempts(companyAccount.getVerifyAttempts() + 1);
             if (companyAccount.getVerifyAttempts() >= 3) {
-                companyAccount.setAccountStatus("BLOCKED");
+                companyAccount.setAccountStatus(ACCOUNT_BLOCKED);
             }
         }
 
-        CompanyAccountRepository.save(companyAccount);
+        companyAccountRepository.save(companyAccount);
     }
 
     public String login(LoginDto dto) {
-        CompanyAccount companyAccount = CompanyAccountRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("CompanyAccount not found"));
+        CompanyAccount companyAccount = companyAccountRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new BusinessException(ACCOUNT_NOT_FOUND_MSG));
 
         if (!companyAccount.isVerified()) {
-            throw new RuntimeException("Email not verified");
+            throw new BusinessException("Email not verified");
         }
 
-        if ("BLOCKED".equals(companyAccount.getAccountStatus())) {
-            throw new RuntimeException("Account blocked");
+        if (ACCOUNT_BLOCKED.equals(companyAccount.getAccountStatus())) {
+            throw new BusinessException("Account blocked");
         }
 
         // Check temp lock
         if (companyAccount.getLockedUntil() != null && companyAccount.getLockedUntil().isAfter(LocalDateTime.now())) {
-            throw new RuntimeException("Account temporarily locked until " + companyAccount.getLockedUntil());
+            throw new BusinessException("Account temporarily locked until " + companyAccount.getLockedUntil());
         }
 
         if (!passwordEncoder.matches(dto.getPassword(), companyAccount.getPasswordHash())) {
@@ -155,20 +165,51 @@ public class AuthService {
                 companyAccount.setLockedUntil(LocalDateTime.now().plusMinutes(15));
                 companyAccount.setLoginAttempts(0);
             }
-            CompanyAccountRepository.save(companyAccount);
-            throw new RuntimeException("Incorrect password");
+            companyAccountRepository.save(companyAccount);
+            throw new BusinessException("Incorrect password");
         }
 
         companyAccount.setLoginAttempts(0);
         companyAccount.setLockedUntil(null);
-        CompanyAccountRepository.save(companyAccount);
+        companyAccountRepository.save(companyAccount);
 
-        return jwtUtil.generateToken(companyAccount.getEmail());
+        return jwtUtil.generateToken(companyAccount.getEmail(), "COMPANY");
     }
 
     public CompanyAccount getCompanyAccountByEmail(String email) {
-        return CompanyAccountRepository.findByEmail(email).orElse(null);
+        return companyAccountRepository.findByEmail(email).orElse(null);
     }
+
+    public ApiAccount getApiAccountByUsername(String username) {
+        return apiAccountRepository.findByUsername(username).orElse(null);
+    }
+
+    public void registerApiAccount(String username, String password) {
+        if (apiAccountRepository.findByUsername(username).isPresent()) {
+            throw new BusinessException("Username already exists");
+        }
+        ApiAccount account = new ApiAccount();
+        account.setUsername(username);
+        account.setPasswordHash(passwordEncoder.encode(password));
+        account.setActive(true);
+        apiAccountRepository.save(account);
+    }
+
+    public String loginApiAccount(String username, String password) {
+        ApiAccount account = apiAccountRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException("API Account not found"));
+
+        if (!account.isActive()) {
+            throw new BusinessException("Account is inactive");
+        }
+
+        if (!passwordEncoder.matches(password, account.getPasswordHash())) {
+            throw new BusinessException("Incorrect password");
+        }
+
+        return jwtUtil.generateToken(username, "API");
+    }
+
 
     private String generateVerificationCode() {
         return String.format("%04d", random.nextInt(10000));

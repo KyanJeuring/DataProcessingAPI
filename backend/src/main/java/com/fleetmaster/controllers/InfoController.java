@@ -2,6 +2,10 @@ package com.fleetmaster.controllers;
 
 import com.fleetmaster.entities.*;
 import com.fleetmaster.services.InfoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/database/info")
+@Tag(name = "Info", description = "Endpoints for retrieving general information")
 public class InfoController {
 
     private final InfoService infoService;
@@ -18,6 +23,12 @@ public class InfoController {
         this.infoService = infoService;
     }
 
+    @Operation(summary = "Get all info", description = "Retrieves a list of all info entries. Requires authenticated and verified company account.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "List of info retrieved"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "403", description = "Company account not verified or blocked")
+    })
     @GetMapping("/get")
     public ResponseEntity<?> getAllInfo(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

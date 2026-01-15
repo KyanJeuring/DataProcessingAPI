@@ -26,6 +26,10 @@ public class SecurityConfig {
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/error").permitAll()
             .requestMatchers("/api/companies/**").permitAll()
+            .requestMatchers("/api/docs/**").permitAll()
+            .requestMatchers("/api/swagger-ui/**").permitAll()
+            .requestMatchers("/swagger-ui/**").permitAll()
+            .requestMatchers("/api/weather/**").authenticated() // Explicitly stating it requires auth
             .anyRequest().authenticated())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

@@ -1,6 +1,7 @@
 package com.fleetmaster.security;
 
 import com.fleetmaster.entities.CompanyAccount;
+import com.fleetmaster.entities.ApiAccount;
 import com.fleetmaster.services.AuthService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,15 +37,28 @@ public class JwtFilter extends OncePerRequestFilter {
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
       String token = authHeader.substring(7);
       try {
-        String email = jwtUtil.extractEmail(token);
+        String subject = jwtUtil.extractSubject(token);
+        String type = jwtUtil.extractType(token);
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-          CompanyAccount companyAccount = authService.getCompanyAccountByEmail(email);
-          if (companyAccount != null && jwtUtil.validateToken(token, companyAccount.getEmail())) {
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                companyAccount, null, Collections.emptyList());
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+        if (subject != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+          if ("API".equals(type)) {
+               ApiAccount apiAccount = authService.getApiAccountByUsername(subject);
+               if (apiAccount != null && jwtUtil.validateToken(token, apiAccount.getUsername())) {
+                 // For now, no roles/authorities for API users, or we can add a simple "ROLE_API"
+                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                         apiAccount, null, Collections.emptyList());
+                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                 SecurityContextHolder.getContext().setAuthentication(authToken);
+               }
+          } else {
+             // Default to COMPANY if type is missing or matches
+              CompanyAccount companyAccount = authService.getCompanyAccountByEmail(subject);
+              if (companyAccount != null && jwtUtil.validateToken(token, companyAccount.getEmail())) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    companyAccount, null, Collections.emptyList());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+              }
           }
         }
       } catch (Exception ignored) {

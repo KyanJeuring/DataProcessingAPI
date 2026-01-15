@@ -35,14 +35,15 @@ WHERE o.status != 'DELIVERED' AND o.status != 'CANCELED'
 ORDER BY o.id, p.time DESC NULLS LAST;
 
 -- View: vw_fleet_status for overview of vehicles and their maintenance status per company
+DROP VIEW IF EXISTS vw_fleet_status CASCADE;
 CREATE OR REPLACE VIEW vw_fleet_status AS
 SELECT 
     cv.company_id,
     v.id AS vehicle_id,
     v.type AS vehicle_type,
     v.load_capacity,
-    v.load_type, -- array of normal, refrigerated, hazardous
-    v.sensor_data, -- JSONB for real-time temp/fuel
+    CAST(v.load_type AS TEXT) AS load_type, -- array of normal, refrigerated, hazardous
+    CAST(v.sensor_data AS TEXT) AS sensor_data, -- JSONB for real-time temp/fuel
     v.last_odometer,
     -- Get the most recent maintenance record status
     (SELECT status FROM maintenance_records mr 
@@ -65,7 +66,7 @@ FROM company_account ca;
 
 
 --View: vw_auth_check for authentication checks including failed login attempts
-DROP VIEW IF EXISTS vw_auth_check;
+DROP VIEW IF EXISTS vw_auth_check CASCADE;
 
 CREATE VIEW vw_auth_check AS
 SELECT 
