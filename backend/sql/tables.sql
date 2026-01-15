@@ -106,6 +106,15 @@ CREATE TABLE IF NOT EXISTS company_account (
     first_name VARCHAR,
     last_name VARCHAR,
     is_active BOOLEAN DEFAULT TRUE,
+    
+    -- Added columns for security requirements
+    is_verified BOOLEAN DEFAULT FALSE,
+    verification_code VARCHAR,
+    login_attempts INT DEFAULT 0,
+    verify_attempts INT DEFAULT 0,
+    locked_until TIMESTAMP,
+    account_status VARCHAR DEFAULT 'ACTIVE',
+
     date_created TIMESTAMP DEFAULT NOW(),
     roles user_role[] NOT NULL DEFAULT ARRAY[]::user_role[],
     preferences JSONB
@@ -114,7 +123,8 @@ CREATE TABLE IF NOT EXISTS company_account (
 CREATE TABLE IF NOT EXISTS logins (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES company_account(id),
-    time TIMESTAMP NOT NULL DEFAULT NOW()
+    time TIMESTAMP NOT NULL DEFAULT NOW(),
+    is_successful BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS password_recovery (
@@ -233,4 +243,24 @@ CREATE TABLE IF NOT EXISTS order_progress (
     order_id BIGINT REFERENCES orders(id),
     progress_id BIGINT REFERENCES progress(id),
     PRIMARY KEY (order_id, progress_id)
+);
+
+-- API ACCOUNTS (for external system access via API)
+
+CREATE TABLE IF NOT EXISTS api_account (
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR NOT NULL UNIQUE,
+    password_hash VARCHAR NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    date_created TIMESTAMP DEFAULT NOW()
+);
+
+-- INFO TABLE (for general information)
+
+CREATE TABLE IF NOT EXISTS info (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR NOT NULL,
+    content TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
