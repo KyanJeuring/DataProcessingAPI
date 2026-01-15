@@ -2,15 +2,17 @@ package com.fleetmaster.services;
 
 import com.fleetmaster.dtos.AddProgressDto;
 import com.fleetmaster.dtos.CreateOrderDto;
+import com.fleetmaster.exceptions.BusinessException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.springframework.stereotype.Service;
-import org.postgresql.util.PGobject;
 
-import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrderService {
@@ -28,10 +30,10 @@ public class OrderService {
     public Long createOrder(Long companyId, CreateOrderDto dto) {
         // 1. Validate ownership
         if (!isVehicleOwnedByCompany(companyId, dto.getVehicleId())) {
-            throw new RuntimeException("Vehicle does not belong to your company");
+            throw new BusinessException("Vehicle does not belong to your company");
         }
         if (!isDriverOwnedByCompany(companyId, dto.getDriverId())) {
-            throw new RuntimeException("Driver does not belong to your company");
+            throw new BusinessException("Driver does not belong to your company");
         }
 
         // 2. Prepare Points
@@ -54,11 +56,73 @@ public class OrderService {
         return orderId.longValue();
     }
 
+    public List<Map<String, Object>> getAllOrders(Long companyId) {
+        return entityManager.createNativeQuery(
+                "SELECT o.* FROM orders o " +
+                "JOIN company_vehicles cv ON o.vehicle_id = cv.vehicle_id " +
+                "WHERE cv.company_id = :cid")
+                .setParameter("cid", companyId)
+                .unwrap(NativeQuery.class)
+                .setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE)
+                .getResultList();
+    }
+
+    public Map<String, Object> getOrderById(Long companyId, Long orderId) {
+        List<Map<String, Object>> results = entityManager.createNativeQuery(
+                "SELECT o.* FROM orders o " +
+                "JOIN company_vehicles cv ON o.vehicle_id = cv.vehicle_id " +
+                "WHERE cv.company_id = :cid AND o.id = :oid")
+                .setParameter("cid", companyId)
+                .setParameter("oid", orderId)
+                .unwrap(NativeQuery.class)
+                .setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE)
+                .getResultList();
+
+        if (results.isEmpty()) {
+            throw new BusinessException("Order not found or does not belong to your company");
+        }
+        return results.get(0);
+    }
+
+    @Transactional
+    public void updateOrderStatus(Long companyId, Long orderId, String status) {
+        // Verify ownership
+        getOrderById(companyId, orderId);
+
+        int updated = entityManager.createNativeQuery(
+                "UPDATE orders SET status = CAST(:status AS order_status) WHERE id = :oid")
+                .setParameter("status", status)
+                .setParameter("oid", orderId)
+                .executeUpdate();
+
+        if (updated == 0) {
+            throw new BusinessException("Failed to update order status");
+        }
+    }
+
+    @Transactional
+    public void deleteOrder(Long companyId, Long orderId) {
+        // Verify ownership
+        getOrderById(companyId, orderId);
+
+        // Delete progress entries first
+        entityManager.createNativeQuery(
+                "DELETE FROM progress WHERE order_id = :oid")
+                .setParameter("oid", orderId)
+                .executeUpdate();
+
+        // Delete order
+        entityManager.createNativeQuery(
+                "DELETE FROM orders WHERE id = :oid")
+                .setParameter("oid", orderId)
+                .executeUpdate();
+    }
+
     @Transactional
     public Long addProgress(Long companyId, AddProgressDto dto) {
         // 1. Validate order ownership
         if(!isOrderOwnedByCompany(companyId, dto.getOrderId())) {
-             throw new RuntimeException("Order does not belong to your company");
+             throw new BusinessException("Order does not belong to your company");
         }
 
         Object position = createPoint(dto.getLat(), dto.getLon());
@@ -68,7 +132,7 @@ public class OrderService {
                 jsonDescription = objectMapper.writeValueAsString(dto.getDescription());
             }
         } catch(Exception e) {
-            throw new RuntimeException("Invalid JSON description");
+            throw new BusinessException("Invalid JSON description");
         }
 
         // sp_add_progress(p_order_id, p_position, p_type, p_description)
@@ -81,6 +145,18 @@ public class OrderService {
             .getSingleResult();
 
         return progressId.longValue();
+    }
+
+    public List<Map<String, Object>> getOrderProgress(Long companyId, Long orderId) {
+        // Verify ownership
+        getOrderById(companyId, orderId);
+
+        return entityManager.createNativeQuery(
+                "SELECT * FROM progress WHERE order_id = :oid ORDER BY time ASC")
+                .setParameter("oid", orderId)
+                .unwrap(NativeQuery.class)
+                .setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE)
+                .getResultList();
     }
 
     private boolean isVehicleOwnedByCompany(Long companyId, Long vehicleId) {

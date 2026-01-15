@@ -244,3 +244,23 @@ CREATE TABLE IF NOT EXISTS order_progress (
     progress_id BIGINT REFERENCES progress(id),
     PRIMARY KEY (order_id, progress_id)
 );
+
+-- API ACCOUNTS (for external system access via API)
+
+CREATE TABLE IF NOT EXISTS api_account (
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR NOT NULL UNIQUE,
+    password_hash VARCHAR NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    date_created TIMESTAMP DEFAULT NOW()
+);
+
+-- INFO TABLE (for general information)
+
+CREATE TABLE IF NOT EXISTS info (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR NOT NULL,
+    content TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);

@@ -210,6 +210,42 @@ public class AuthService {
         return jwtUtil.generateToken(username, "API");
     }
 
+    @Transactional
+    public String requestPasswordRecovery(String email) {
+        // Call stored procedure to generate recovery token
+        try {
+            Object[] result = (Object[]) entityManager.createNativeQuery(
+                    "SELECT user_id, recovery_token, expires_at FROM sp_request_password_recovery(:email)")
+                    .setParameter("email", email)
+                    .getSingleResult();
+            
+            String token = result[1].toString();
+            
+            // Send recovery email
+            emailService.sendPasswordRecoveryEmail(email, token);
+            
+            return token;
+        } catch (Exception e) {
+            throw new BusinessException("Failed to request password recovery: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        // Call stored procedure to reset password
+        try {
+            String hashedPassword = passwordEncoder.encode(newPassword);
+            
+            entityManager.createNativeQuery(
+                    "SELECT * FROM sp_reset_password(CAST(:token AS uuid), :newPassword)")
+                    .setParameter("token", token)
+                    .setParameter("newPassword", hashedPassword)
+                    .getSingleResult();
+        } catch (Exception e) {
+            throw new BusinessException("Failed to reset password: " + e.getMessage());
+        }
+    }
+
 
     private String generateVerificationCode() {
         return String.format("%04d", random.nextInt(10000));

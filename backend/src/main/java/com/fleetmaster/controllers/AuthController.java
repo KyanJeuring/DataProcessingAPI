@@ -6,6 +6,8 @@ import com.fleetmaster.dtos.EmailDto;
 import com.fleetmaster.dtos.LoginDto;
 import com.fleetmaster.dtos.RegisterDto;
 import com.fleetmaster.dtos.VerifyCodeDto;
+import com.fleetmaster.dtos.PasswordRecoveryRequestDto;
+import com.fleetmaster.dtos.PasswordResetDto;
 import com.fleetmaster.services.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -83,5 +85,27 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<Object> me(org.springframework.security.core.Authentication authentication) {
         return ResponseEntity.ok(authentication.getPrincipal());
+    }
+
+    @Operation(summary = "Request password recovery", description = "Sends a password recovery token to the user's email.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Recovery email sent"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @PostMapping("/password/recover")
+    public ResponseEntity<Object> requestPasswordRecovery(@RequestBody PasswordRecoveryRequestDto dto) {
+        authService.requestPasswordRecovery(dto.getEmail());
+        return ResponseEntity.ok("Password recovery email sent.");
+    }
+
+    @Operation(summary = "Reset password", description = "Resets the password using a valid recovery token.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Password reset successful"),
+        @ApiResponse(responseCode = "400", description = "Invalid or expired token")
+    })
+    @PostMapping("/password/reset")
+    public ResponseEntity<Object> resetPassword(@RequestBody PasswordResetDto dto) {
+        authService.resetPassword(dto.getToken(), dto.getNewPassword());
+        return ResponseEntity.ok("Password reset successful.");
     }
 }

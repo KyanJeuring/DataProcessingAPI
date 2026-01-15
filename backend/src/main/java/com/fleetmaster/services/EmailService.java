@@ -32,4 +32,21 @@ public class EmailService {
             logger.warn("Email send failed, proceeding without email: {}", ex.getMessage());
         }
     }
+
+    public void sendPasswordRecoveryEmail(String to, String token) {
+        logger.info("--- PASSWORD RECOVERY EMAIL ---");
+        logger.info("To: {}", to);
+        logger.info("Token: {}", token);
+        logger.info("-------------------------------");
+
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(to);
+        msg.setSubject("FleetMaster Password Recovery");
+        msg.setText("Your password recovery token: " + token + "\n\nThis token expires in 1 hour.");
+        try {
+            mailSender.send(msg);
+        } catch (Exception ex) {
+            logger.warn("Email send failed, proceeding without email: {}", ex.getMessage());
+        }
+    }
 }

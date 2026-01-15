@@ -1,8 +1,10 @@
 SET session_replication_role = 'replica';
 
+TRUNCATE TABLE "api_account" CASCADE;
 TRUNCATE TABLE "company" CASCADE;
 TRUNCATE TABLE "company_account" CASCADE;
 TRUNCATE TABLE "company_vehicles" CASCADE;
+TRUNCATE TABLE "info" CASCADE;
 TRUNCATE TABLE "license_levels" CASCADE;
 TRUNCATE TABLE "logins" CASCADE;
 TRUNCATE TABLE "maintenance_records" CASCADE;
@@ -247,6 +249,21 @@ INSERT INTO "license_levels" ("id", "name", "max_vehicles", "max_drivers", "max_
 (2, 'PROFESSIONAL', 50, 50, 500, 299.99),
 (3, 'ENTERPRISE', NULL, NULL, NULL, 999.99);
 
+
+-- fabricate-flush
+
+-- INFO DATA
+INSERT INTO "info" ("id", "title", "content", "created_at", "updated_at") VALUES
+(1, 'Welcome to FleetMaster', 'FleetMaster is your comprehensive logistics management platform.', NOW(), NOW()),
+(2, 'System Maintenance', 'System maintenance is scheduled for the first Sunday of each month.', NOW(), NOW()),
+(3, 'License Information', 'We offer three license tiers: Basic, Professional, and Enterprise.', NOW(), NOW());
+
+-- fabricate-flush
+
+-- API ACCOUNT DATA (for testing)
+INSERT INTO "api_account" ("id", "username", "password_hash", "is_active", "date_created") VALUES
+(1, 'api_user_test', '$2a$10$abcdefghijklmnopqrstuvwxyz1234567890', true, NOW()),
+(2, 'external_system', '$2a$10$zyxwvutsrqponmlkjihgfedcba0987654321', true, NOW());
 
 -- fabricate-flush
 
