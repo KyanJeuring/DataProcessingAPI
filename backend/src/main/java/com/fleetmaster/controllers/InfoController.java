@@ -28,7 +28,7 @@ public class InfoController {
         if (!companyAccount.isVerified()) {
             return ResponseEntity.status(403).body("Company account not verified");
         }
-        if ("BLOCKED".equals(companyAccount.getStatus())) {
+        if ("BLOCKED".equals(companyAccount.getAccountStatus())) {
             return ResponseEntity.status(403).body("Company account blocked");
         }
 
