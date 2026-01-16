@@ -84,6 +84,10 @@ public class CompanyAccount {
     }
 
     public void setId(Long id) {
+        if (id < 0) {
+            throw new IllegalArgumentException("The ID cannot be a negative number.");
+        }
+
         this.id = id;
     }
 
