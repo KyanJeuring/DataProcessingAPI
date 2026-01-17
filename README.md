@@ -79,3 +79,11 @@ To test protected endpoints (orders, fleet, vehicles, etc.) in Swagger, you need
 4. Click the **"Authorize"** button in Swagger (top right)
 5. Paste the token in the modal
 6. Now you can test all protected endpoints!
+
+## Additional Documentation
+
+This project includes comprehensive documentation for various aspects of the system:
+
+- **[BACKUP_RECOVERY_PROTOCOL.md](BACKUP_RECOVERY_PROTOCOL.md)** — Complete backup and disaster recovery strategy including automated daily backups, recovery procedures for different scenarios, and retention policies. Essential reading for understanding how we protect data and handle emergencies.
+
+- **[DATABASE_DOCUMENTATION.md](backend/sql/DATABASE_DOCUMENTATION.md)** — Full technical specification of the PostgreSQL database schema including all tables, stored procedures, views, triggers, and usage examples. Reference this when working with the database or implementing new features.
