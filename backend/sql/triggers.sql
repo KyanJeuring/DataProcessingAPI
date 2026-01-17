@@ -6,7 +6,7 @@ DECLARE
     v_current_count BIGINT;
 BEGIN
     -- Get max vehicles from active subscription
-    SELECT ll.max_vehicles INTO v_max_vehicles
+        SELECT COALESCE(ll.max_vehicles, 1000000000) INTO v_max_vehicles
     FROM subscriptions s
     JOIN license_levels ll ON s.license_id = ll.id
     WHERE s.company_id = NEW.company_id
@@ -54,7 +54,7 @@ BEGIN
        (OLD.roles IS NULL OR NOT ('DRIVER' = ANY(OLD.roles))) THEN
         
         -- Get max drivers from active subscription
-        SELECT ll.max_drivers INTO v_max_drivers
+                SELECT COALESCE(ll.max_drivers, 1000000000) INTO v_max_drivers
         FROM subscriptions s
         JOIN license_levels ll ON s.license_id = ll.id
         WHERE s.company_id = v_company_id

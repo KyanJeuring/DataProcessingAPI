@@ -84,3 +84,106 @@
   font-size: 14px;
   text-align: center;
 }
+
+.token-display {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.token-display h3 {
+  color: #27ae60;
+  margin-top: 0;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.token-label {
+  color: #0a3d62;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.token-box {
+  background: #f5f7fa;
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.token-text {
+  flex: 1;
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  word-break: break-word;
+  color: #0a3d62;
+  background: white;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  line-height: 1.4;
+}
+
+.copy-btn {
+  padding: 8px 12px;
+  background: #ffffff;
+  color: #1e90ff;
+  border: 1px solid #1e90ff;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.copy-btn:hover {
+  background: #1e90ff;
+  color: #ffffff;
+  border-color: #1e90ff;
+}
+
+.token-hint {
+  font-size: 12px;
+  color: #7f8c8d;
+  text-align: center;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.dashboard-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #27ae60, #1e8449);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.dashboard-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(39, 174, 96, 0.4);
+}

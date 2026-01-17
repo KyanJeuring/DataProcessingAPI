@@ -45,7 +45,10 @@ public class CompanyController {
       @ApiResponse(responseCode = "201", description = "Company created successfully"),
       @ApiResponse(responseCode = "400", description = "Invalid input data")
   })
-  @PostMapping
+  @PostMapping(consumes = {
+      MediaType.APPLICATION_JSON_VALUE,
+      MediaType.APPLICATION_XML_VALUE
+  })
   public ResponseEntity<Company> create(@RequestBody Company incoming) {
     if (incoming.getName() == null || incoming.getName().trim().isEmpty()) {
       return ResponseEntity.badRequest().build();

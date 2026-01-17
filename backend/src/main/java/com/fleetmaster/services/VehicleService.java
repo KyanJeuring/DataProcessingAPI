@@ -37,12 +37,18 @@ public class VehicleService {
                 .setParameter("odo", dto.getLastOdometer())
                 .getSingleResult();
 
-        // 2. Link to company
+        // Flush to ensure vehicle is persisted before linking to company
+        entityManager.flush();
+
+        // 2. Link to company (this triggers enforce_vehicle_limit() function)
         entityManager.createNativeQuery(
                 "INSERT INTO company_vehicles (company_id, vehicle_id) VALUES (:cid, :vid)")
                 .setParameter("cid", companyId)
                 .setParameter("vid", vehicleId.longValue())
                 .executeUpdate();
+
+        // Flush again to ensure the trigger can see subscription data
+        entityManager.flush();
 
         return vehicleId.longValue();
     }

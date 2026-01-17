@@ -243,11 +243,19 @@ function logout() {
            <h3>Update Order #{{ progressUpdate.orderId }}</h3>
            <label>Type: 
              <select v-model="progressUpdate.type">
-               <option>DEPARTURE</option>
-               <option>STOPOVER</option>
-               <option>FUEL</option>
-               <option>Loading</option>
-               <option>BREAK</option>
+                 <option>LOADING</option>
+                 <option>DEPARTURE</option>
+                 <option>STOPOVER</option>
+                 <option>BREAK</option>
+                 <option>FUEL</option>
+                 <option>STOP</option>
+                 <option>INSPECTION</option>
+                 <option>DEVIATION</option>
+                 <option>BREAKDOWN</option>
+                 <option>INTERRUPTION</option>
+                 <option>UNLOADING</option>
+                 <option>ARRIVAL</option>
+                 <option>COMPLETION</option>
             </select>
            </label>
            <label>Lat: <input v-model="progressUpdate.lat"></label>

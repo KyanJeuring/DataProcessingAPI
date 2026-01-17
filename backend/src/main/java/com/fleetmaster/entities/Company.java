@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "company")
@@ -15,9 +16,12 @@ public class Company {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @NotBlank(message = "Company name is required")
+  @Size(min = 1, max = 200, message = "Company name must be between 1 and 200 characters")
   @Column(nullable = false)
   private String name;
 
+  @Min(value = 0, message = "License number cannot be negative")
   @Column
   private Integer license;
 
