@@ -1,5 +1,8 @@
 package main.java.com.fleetmaster.entities;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -8,9 +11,11 @@ public class RouteCheckpoint {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Future(message = "The timestamp cannot be in the past.")
     @Column(name = "timestamp", nullable = false)
     private LocalDateTime timestamp;
 
+    @NotBlank(message = "Please provide a location to this route checkpoint.")
     @Column(name = "location", nullable = false)
     private String location;
 
@@ -39,9 +44,6 @@ public class RouteCheckpoint {
     }
 
     public void setLocation(String location) {
-        if (this.location == null || location.trim().isEmpty()) {
-            throw new IllegalArgumentException("Please provide a location to this checkpoint");
-        }
         this.location = location;
     }
 }

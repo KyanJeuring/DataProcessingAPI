@@ -1,17 +1,24 @@
 package main.java.com.fleetmaster.entities;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+
 @Entity
 @Table(name = "profile")
 public class Profile {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Please provide a name to this profile.")
+    @Size(min = 2, max = 20, message = "Profile name must be between 2 and 20 characters")
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
+    @NotBlank(message = "Please provide a role to this profile.")
     @Column(name = "role" nullable = false)
     private Employee role;
 
+    @NotBlank(message = "Please provide a location to this profile.")
     @Column(name = "location" nullable = false)
     private String location;
 
@@ -44,10 +51,6 @@ public class Profile {
     }
 
     public void setRole(Employee role) {
-        if (role == null) {
-            throw new IllegalArgumentException("Please provide a role to this profile.");
-        }
-
         this.role = role;
     }
 

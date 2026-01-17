@@ -1,5 +1,8 @@
 package main.java.com.fleetmaster.entities;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+
 import java.util.HashSet;
 
 @Entity
@@ -8,12 +11,16 @@ public class Route {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Please provide a starting location to this route")
     @Column(name = "startingLocation", nullable = false)
     private String startingLocation;
 
+    @NotBlank(message = "Please provide a destination to this route")
     @Column(name = "destination", nullable = false)
     private String destination;
 
+    @NotBlank(message = "Please provide a maximum travel time to this route.")
+    @Min(value = 0.1, message = "The maximum travel time cannot be a negative number.")
     @Column(name = "maxTravelTime", nullable = false)
     private double maxTravelTime;
 
@@ -29,18 +36,10 @@ public class Route {
     }
 
     public void setId(Long id) {
-        if (id < 0) {
-            throw new IllegalArgumentException("The ID cannot be a negative number.");
-        }
-
         this.id = id;
     }
 
     public void setStartingLocation(String startingLocation) {
-        if (startingLocation == null || startingLocation.trim().isEmpty()) {
-            throw new IllegalArgumentException("Please provide a starting location.");
-        }
-
         this.startingLocation = startingLocation;
     }
 
@@ -49,10 +48,6 @@ public class Route {
     }
 
     public void setDestination(String destination) {
-        if (destination == null || destination.trim().isEmpty()) {
-            throw new IllegalArgumentException("Please provide a destination.");
-        }
-
         this.destination = destination;
     }
 
@@ -61,10 +56,6 @@ public class Route {
     }
 
     public void setMaxTravelTime(double maxTravelTime) {
-        if (maxTravelTime < 0.0) {
-            throw new IllegalArgumentException("The maximum travel time cannot be a negative number.");
-        }
-
         this.maxTravelTime = maxTravelTime;
     }
 
