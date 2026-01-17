@@ -1,6 +1,7 @@
 package com.fleetmaster.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "info")
@@ -8,9 +9,13 @@ public class Info {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Name is required")
+    @Size(min = 1, max = 255, message = "Name must be between 1 and 255 characters")
     @Column(nullable = false)
     private String name;
 
+    @NotNull(message = "Count is required")
+    @Min(value = 0, message = "Count cannot be negative")
     @Column(nullable = false)
     private Integer count;
 

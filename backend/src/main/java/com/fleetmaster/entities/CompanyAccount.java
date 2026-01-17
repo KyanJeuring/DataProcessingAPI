@@ -1,6 +1,7 @@
 package com.fleetmaster.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -19,18 +20,25 @@ public class CompanyAccount {
     @Column(name = "company_id")
     private Long companyId;
 
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @NotBlank(message = "Password hash is required")
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    @Size(max = 100, message = "First name must not exceed 100 characters")
     @Column(name = "first_name")
     private String firstName;
 
+    @Size(max = 100, message = "Last name must not exceed 100 characters")
     @Column(name = "last_name")
     private String lastName;
 
@@ -40,18 +48,22 @@ public class CompanyAccount {
     @Column(name = "is_verified", nullable = false)
     private boolean verified = false;
 
+    @Size(min = 4, max = 4, message = "Verification code must be exactly 4 characters")
     @Column(name = "verification_code", length = 4)
     private String verificationCode;
 
+    @Min(value = 0, message = "Login attempts cannot be negative")
     @Column(name = "login_attempts", nullable = false)
     private int loginAttempts = 0;
 
+    @Min(value = 0, message = "Verify attempts cannot be negative")
     @Column(name = "verify_attempts", nullable = false)
     private int verifyAttempts = 0;
 
     @Column(name = "locked_until")
     private LocalDateTime lockedUntil;
 
+    @Pattern(regexp = "ACTIVE|BLOCKED|PENDING|SUSPENDED", message = "Account status must be ACTIVE, BLOCKED, PENDING, or SUSPENDED")
     @Column(name = "account_status")
     private String accountStatus = "ACTIVE";
 
