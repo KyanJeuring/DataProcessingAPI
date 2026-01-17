@@ -1,3 +1,9 @@
+-- TEST CREDENTIALS FOR SWAGGER/API TESTING
+-- Email: test@swagger.dev
+-- Password: TestPassword123!
+-- Company: SwiftLog Transport (ID: 1)
+-- This account is verified and ready to use immediately
+
 SET session_replication_role = 'replica';
 
 TRUNCATE TABLE "api_account" CASCADE;

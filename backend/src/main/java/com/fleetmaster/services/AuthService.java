@@ -58,7 +58,13 @@ public class AuthService {
         }
 
         Long companyId = null;
-        if (dto.getCompanyName() != null && !dto.getCompanyName().isBlank()) {
+        
+        // Priority 1: Use existing company if companyId provided
+        if (dto.getCompanyId() != null) {
+            companyId = dto.getCompanyId();
+        }
+        // Priority 2: Create new company if companyName provided
+        else if (dto.getCompanyName() != null && !dto.getCompanyName().isBlank()) {
             // Call stored procedure to create company and get ID
             // Function returns table(company_id, subscription_id, ...)
             // We select just the company_id
@@ -71,6 +77,10 @@ public class AuthService {
                 if (result instanceof Number number) {
                     companyId = number.longValue();
                 }
+                
+                // Flush to ensure the company and subscription are persisted
+                // before subsequent operations that depend on them (e.g., triggers)
+                entityManager.flush();
             } catch (Exception e) {
                 // If company exists or other error
                 throw new BusinessException("Error creating company: " + e.getMessage());

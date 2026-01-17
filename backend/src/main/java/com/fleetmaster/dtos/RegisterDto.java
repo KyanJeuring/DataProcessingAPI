@@ -11,6 +11,7 @@ public class RegisterDto {
     private String firstName;
     private String lastName;
     private String companyName;
+    private Long companyId;
     private UserRole[] roles;
     private Map<String, Object> preferences;
 
@@ -62,6 +63,14 @@ public class RegisterDto {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    public Long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
     }
 
     public UserRole[] getRoles() {

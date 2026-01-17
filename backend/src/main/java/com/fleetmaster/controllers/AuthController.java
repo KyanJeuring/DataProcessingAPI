@@ -25,7 +25,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @Operation(summary = "Register a new company account", description = "Creates a new company account and sends a verification code via email.")
+    @Operation(summary = "Register a new company account", description = "Creates a new company account and sends a verification code via email. Either provide companyId to join existing company or companyName to create new company.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Registration successful"),
         @ApiResponse(responseCode = "400", description = "Invalid input or email already exists")
