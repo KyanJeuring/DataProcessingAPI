@@ -10,6 +10,28 @@ This document outlines the backup and recovery strategy for the FleetMaster Logi
 
 **Schedule:** Daily at 2:00 AM (Server Time)
 
+**Rationale for Daily Backups:**
+
+The FleetMaster system processes critical logistics data including:
+- **Real-time order tracking** - Active shipments with time-sensitive delivery windows
+- **Financial records** - Payment transactions, invoicing, and discount calculations
+- **Fleet operations** - Vehicle assignments, driver schedules, and maintenance records
+- **Compliance data** - Regulatory documentation and audit trails
+
+Daily backups are essential because:
+
+1. **Data Loss Prevention**: A 24-hour recovery point objective (RPO) minimizes potential data loss. In logistics, losing even one day of shipment data could mean missing delivery deadlines, lost revenue, and damaged customer relationships.
+
+2. **Regulatory Compliance**: Transportation and logistics companies are required to maintain accurate records for auditing purposes. Daily backups ensure we can recover historical data needed for compliance investigations, tax audits, and legal proceedings.
+
+3. **Operational Continuity**: Fleet operations run 24/7 with continuous data generation. Daily backups capture the complete state of operations including vehicle locations, order progress updates, and system changes made during business hours.
+
+4. **Cost-Benefit Balance**: While more frequent backups (hourly) would reduce RPO, daily backups strike the optimal balance between storage costs, system performance impact, and acceptable data loss risk for our business model.
+
+5. **Human Error Mitigation**: Accidental deletions, incorrect updates, or configuration changes can corrupt data. Daily backups provide reliable restore points before issues compound over multiple days.
+
+6. **Disaster Recovery Preparedness**: In the event of hardware failure, ransomware attacks, or data center outages, daily backups ensure we can restore operations within our 2-hour RTO target with minimal business impact.
+
 **Implementation:** 
 - Automated via Spring Boot `@Scheduled` annotation in `BackupService.java`
 - Uses PostgreSQL's `pg_dump` utility
