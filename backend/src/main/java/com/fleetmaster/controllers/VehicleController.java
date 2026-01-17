@@ -35,7 +35,10 @@ public class VehicleController {
         @ApiResponse(responseCode = "200", description = "Vehicle created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input or company not found")
     })
-    @PostMapping("/create")
+    @PostMapping(value = "/create", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE
+    })
     public ResponseEntity<?> createVehicle(@RequestBody CreateVehicleDto dto, Authentication authentication) {
         CompanyAccount companyAccount = (CompanyAccount) authentication.getPrincipal();
         if (companyAccount.getCompanyId() == null) {
@@ -80,7 +83,10 @@ public class VehicleController {
         @ApiResponse(responseCode = "200", description = "Vehicle updated successfully"),
         @ApiResponse(responseCode = "404", description = "Vehicle not found")
     })
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE
+    })
     public ResponseEntity<?> updateVehicle(@PathVariable Long id, @RequestBody CreateVehicleDto dto, Authentication authentication) {
         CompanyAccount companyAccount = (CompanyAccount) authentication.getPrincipal();
         if (companyAccount.getCompanyId() == null) {

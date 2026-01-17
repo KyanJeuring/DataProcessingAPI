@@ -13,14 +13,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(value = "/api/auth", produces = {
+    MediaType.APPLICATION_JSON_VALUE,
+    MediaType.APPLICATION_XML_VALUE
+})
 @Tag(name = "Authentication", description = "Endpoints for user registration, login, and verification")
 public class AuthController {
     private final AuthService authService;
+
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
@@ -30,7 +35,10 @@ public class AuthController {
         @ApiResponse(responseCode = "200", description = "Registration successful"),
         @ApiResponse(responseCode = "400", description = "Invalid input or email already exists")
     })
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE
+    })
     public ResponseEntity<Object> register(@RequestBody RegisterDto dto) {
         authService.register(dto);
         return ResponseEntity.ok("Company account registered. Verification code sent.");
@@ -41,21 +49,30 @@ public class AuthController {
         @ApiResponse(responseCode = "200", description = "Login successful, returns JWT token"),
         @ApiResponse(responseCode = "401", description = "Invalid credentials")
     })
-    @PostMapping("/login")
+    @PostMapping(value = "/login", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE
+    })
     public ResponseEntity<Object> login(@RequestBody LoginDto dto) {
         String token = authService.login(dto);
         return ResponseEntity.ok().body(java.util.Map.of("token", token));
     }
 
     @Operation(summary = "Register API Account", description = "Register a new API user account (for external systems).")
-    @PostMapping("/api-register")
+    @PostMapping(value = "/api-register", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE
+    })
     public ResponseEntity<Object> apiRegister(@RequestBody ApiRegisterDto dto) {
         authService.registerApiAccount(dto.getUsername(), dto.getPassword());
         return ResponseEntity.ok("API Account registered.");
     }
 
     @Operation(summary = "Login API Account", description = "Login as an API user to get a JWT token.")
-    @PostMapping("/api-login")
+    @PostMapping(value = "/api-login", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE
+    })
     public ResponseEntity<Object> apiLogin(@RequestBody ApiLoginDto dto) {
         String token = authService.loginApiAccount(dto.getUsername(), dto.getPassword());
         return ResponseEntity.ok().body(java.util.Map.of("token", token));
@@ -63,7 +80,10 @@ public class AuthController {
 
     @Operation(summary = "Send verification code", description = "Resends the verification code to the registered email.")
     @ApiResponse(responseCode = "200", description = "Verification code sent")
-    @PostMapping("/verify/code/send")
+    @PostMapping(value = "/verify/code/send", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE
+    })
     public ResponseEntity<Object> sendCode(@RequestBody EmailDto emailDto) {
         authService.sendVerifyCode(emailDto.getEmail());
         return ResponseEntity.ok("Verification code sent.");
@@ -74,7 +94,10 @@ public class AuthController {
         @ApiResponse(responseCode = "200", description = "Verification successful"),
         @ApiResponse(responseCode = "400", description = "Invalid code")
     })
-    @PostMapping("/verify/code/check")
+    @PostMapping(value = "/verify/code/check", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE
+    })
     public ResponseEntity<Object> checkCode(@RequestBody VerifyCodeDto dto) {
         authService.checkVerifyCode(dto);
         return ResponseEntity.ok("Verification checked.");
@@ -92,7 +115,10 @@ public class AuthController {
         @ApiResponse(responseCode = "200", description = "Recovery email sent"),
         @ApiResponse(responseCode = "404", description = "User not found")
     })
-    @PostMapping("/password/recover")
+    @PostMapping(value = "/password/recover", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE
+    })
     public ResponseEntity<Object> requestPasswordRecovery(@RequestBody PasswordRecoveryRequestDto dto) {
         authService.requestPasswordRecovery(dto.getEmail());
         return ResponseEntity.ok("Password recovery email sent.");
@@ -103,7 +129,10 @@ public class AuthController {
         @ApiResponse(responseCode = "200", description = "Password reset successful"),
         @ApiResponse(responseCode = "400", description = "Invalid or expired token")
     })
-    @PostMapping("/password/reset")
+    @PostMapping(value = "/password/reset", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE
+    })
     public ResponseEntity<Object> resetPassword(@RequestBody PasswordResetDto dto) {
         authService.resetPassword(dto.getToken(), dto.getNewPassword());
         return ResponseEntity.ok("Password reset successful.");

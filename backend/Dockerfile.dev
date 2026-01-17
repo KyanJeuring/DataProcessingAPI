@@ -11,4 +11,4 @@ COPY src ./src
 
 EXPOSE 8081
 
-CMD ["mvn", "spring-boot:run"]
+CMD ["mvn", "-Dmaven.test.skip=true", "spring-boot:run"]

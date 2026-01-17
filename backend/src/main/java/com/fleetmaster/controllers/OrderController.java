@@ -36,7 +36,10 @@ public class OrderController {
         @ApiResponse(responseCode = "200", description = "Order created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input or company not found")
     })
-    @PostMapping("/create")
+    @PostMapping(value = "/create", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE
+    })
     public ResponseEntity<?> createOrder(@RequestBody CreateOrderDto dto, Authentication authentication) {
         CompanyAccount companyAccount = (CompanyAccount) authentication.getPrincipal();
         if (companyAccount.getCompanyId() == null) {
@@ -113,7 +116,10 @@ public class OrderController {
         @ApiResponse(responseCode = "200", description = "Progress added successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input or order not found")
     })
-    @PostMapping("/progress")
+    @PostMapping(value = "/progress", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE
+    })
     public ResponseEntity<?> addProgress(@RequestBody AddProgressDto dto, Authentication authentication) {
         CompanyAccount companyAccount = (CompanyAccount) authentication.getPrincipal();
         if (companyAccount.getCompanyId() == null) {
