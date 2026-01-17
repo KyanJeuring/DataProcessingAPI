@@ -62,7 +62,7 @@ To test protected endpoints (orders, fleet, vehicles, etc.) in Swagger, you need
    - Fill in your details
    - Verify your email using the verification code
 3. **Log in** on the frontend
-4. The JWT token is stored in your browser session
+4. The JWT token is shown when you first log in, press the copy button.
 5. Now open Swagger UI: `http://localhost:8081/api/docs`
 6. Click the **"Authorize"** button (top right)
 7. Paste your token in the modal
